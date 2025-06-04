@@ -1,0 +1,185 @@
+/* General styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #F6F4E9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* Ensure body takes full viewport height */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container styling */
+.container {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Align content to the top */
+  padding: 20px;
+  width: 1390px;
+}
+
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #CDD1C1;
+  width: 100%;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+}
+
+.linksContainer {
+  display: flex;
+  gap: 35px;
+  flex-wrap: wrap;
+  margin-left: 40px;
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  transition: color 0.3s ease;
+}
+
+/* Main content styling */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Align content to the top */
+  width: 1390px;
+  margin: 0 auto;
+}
+
+/* Search dropdown styling */
+.search-dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 800px; /* Fixed width for desktop */
+  margin: 0 auto; /* Center the search dropdown */
+}
+
+.search-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dropdown-list {
+  position: absolute;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 10;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Offers section styling */
+.offers-section {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 1390px; /* Fixed width for desktop */
+  margin: 0 auto; /* Center the offers section */
+}
+
+.offers-heading {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.offers-cards-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.offer-card {
+  background-color: #39641D;
+  color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: left;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.offer-card:hover {
+  transform: translateY(-5px);
+}
+
+.offer-card strong {
+  font-weight: bold;
+  color: white;
+}
+
+/* No offers message styling */
+.no-offers-message {
+  color: red;
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 20px;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px; /* Reduce padding on mobile */
+    width: 90%;
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align content to the top */
+    
+  }
+
+  .main {
+    width: 90%;
+    padding: 10px; /* Reduce padding on mobile */
+  }
+  
+  .container h1{
+    font-size: 50px;
+    text-align: center;
+  }
+}
