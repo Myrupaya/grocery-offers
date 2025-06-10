@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import "./App.css"; // Reuse the same CSS file
 
-const GroceryOffers = () => {
+const MovieOffers = () => {
   const [creditCards, setCreditCards] = useState([]);
   const [debitCards, setDebitCards] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCreditCards, setFilteredCreditCards] = useState([]);
   const [filteredDebitCards, setFilteredDebitCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState("");
-  const [groceryOffers, setGroceryOffers] = useState([]);
+  const [movieOffers, setMovieOffers] = useState([]);
   const [noOffersMessage, setNoOffersMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -66,8 +66,8 @@ const GroceryOffers = () => {
 
     const fetchData = async () => {
       try {
-        const groceryData = await fetchAndParseCSV("/Corrected_Grocery_Offers.csv");
-        const { creditCards, debitCards } = extractCards(groceryData);
+        const movieData = await fetchAndParseCSV("/Corrected_Movie_Offers.csv");
+        const { creditCards, debitCards } = extractCards(movieData);
         setCreditCards(creditCards);
         setDebitCards(debitCards);
         setFilteredCreditCards(creditCards);
@@ -100,9 +100,9 @@ const GroceryOffers = () => {
       );
 
     try {
-      const groceryData = await fetchAndParseCSV("/Corrected_Grocery_Offers.csv");
-      const filteredOffers = filterOffers(groceryData, card);
-      setGroceryOffers(filteredOffers);
+      const movieData = await fetchAndParseCSV("/Corrected_Movie_Offers.csv");
+      const filteredOffers = filterOffers(movieData, card);
+      setMovieOffers(filteredOffers);
 
       if (filteredOffers.length === 0) {
         setNoOffersMessage("No offers found for this card.");
@@ -124,7 +124,7 @@ const GroceryOffers = () => {
       setFilteredDebitCards(debitCards);
       setNoOffersMessage("");
       setSelectedCard("");
-      setGroceryOffers([]);
+      setMovieOffers([]);
       return;
     }
 
@@ -155,26 +155,29 @@ const GroceryOffers = () => {
   };
 
   return (
-    <div className="container" >
-      {/* Navbar Component */}
-      <nav className="navbar">
-        <div className="logoContainer">
-          <a href="https://www.myrupaya.in/">
-            <img
-              src="https://static.wixstatic.com/media/f836e8_26da4bf726c3475eabd6578d7546c3b2~mv2.jpg/v1/crop/x_124,y_0,w_3152,h_1458/fill/w_909,h_420,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/dark_logo_white_background.jpg"
-              alt="MyRupaya Logo"
-              className="logo"
-            />
-          </a>
-          <div className="linksContainer">
-            <a href="https://www.myrupaya.in/" className="link">
-              Home
-            </a>
-          </div>
-        </div>
-      </nav>
+    <div className="container">
+      <div className="title-box">
+        <h1>Movie Offers</h1>
+      </div>
 
-      <h1>Grocery Offers</h1>
+      <div className="content-row">
+        <div className="text-section">
+          <h2>Find the Best Movie Ticket Offers</h2>
+          <p>
+            Discover amazing discounts and cashback offers on movie tickets 
+            using your credit or debit cards. Search for your card to see 
+            available offers from various platforms. Save money on your next 
+            movie outing with these exclusive deals!
+          </p>
+        </div>
+        <div className="image-section">
+          <img 
+            src="https://via.placeholder.com/400x300?text=Movie+Tickets" 
+            alt="Movie tickets" 
+            className="movie-image"
+          />
+        </div>
+      </div>
 
       <div className="main">
         <div className="search-dropdown">
@@ -232,9 +235,9 @@ const GroceryOffers = () => {
 
         {selectedCard && !noOffersMessage && (
           <div className="offers-section">
-            {groceryOffers.length > 0 && (
+            {movieOffers.length > 0 && (
               <div>
-                {groceryOffers.map((offer, index) => (
+                {movieOffers.map((offer, index) => (
                   <div key={index} className="offers-container">
                     <h2 className="offers-heading">
                       <strong>Offers on</strong> {offer.App}
@@ -260,4 +263,4 @@ const GroceryOffers = () => {
   );
 };
 
-export default GroceryOffers;
+export default MovieOffers;

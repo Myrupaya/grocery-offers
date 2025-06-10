@@ -183,3 +183,59 @@ body {
     text-align: center;
   }
 }
+
+/* Add these styles to your existing App.css */
+
+.title-box {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.title-box h1 {
+  color: black;
+  margin: 0;
+}
+
+.content-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.text-section, .image-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.text-section h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.text-section p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.movie-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+  .content-row {
+    flex-direction: column;
+  }
+  
+  .text-section, .image-section {
+    width: 100%;
+  }
+}
