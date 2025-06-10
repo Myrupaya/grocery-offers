@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
-import "./App.css"; // Reuse the same CSS file
+import "./App.css";
 
-const MovieOffers = () => {
+const GroceryOffers = () => {
   const [creditCards, setCreditCards] = useState([]);
   const [debitCards, setDebitCards] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCreditCards, setFilteredCreditCards] = useState([]);
   const [filteredDebitCards, setFilteredDebitCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState("");
-  const [movieOffers, setMovieOffers] = useState([]);
+  const [groceryOffers, setGroceryOffers] = useState([]);
   const [noOffersMessage, setNoOffersMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -66,8 +66,8 @@ const MovieOffers = () => {
 
     const fetchData = async () => {
       try {
-        const movieData = await fetchAndParseCSV("/Corrected_Movie_Offers.csv");
-        const { creditCards, debitCards } = extractCards(movieData);
+        const groceryData = await fetchAndParseCSV("/Corrected_Grocery_Offers.csv");
+        const { creditCards, debitCards } = extractCards(groceryData);
         setCreditCards(creditCards);
         setDebitCards(debitCards);
         setFilteredCreditCards(creditCards);
@@ -100,9 +100,9 @@ const MovieOffers = () => {
       );
 
     try {
-      const movieData = await fetchAndParseCSV("/Corrected_Movie_Offers.csv");
-      const filteredOffers = filterOffers(movieData, card);
-      setMovieOffers(filteredOffers);
+      const groceryData = await fetchAndParseCSV("/Corrected_Grocery_Offers.csv");
+      const filteredOffers = filterOffers(groceryData, card);
+      setGroceryOffers(filteredOffers);
 
       if (filteredOffers.length === 0) {
         setNoOffersMessage("No offers found for this card.");
@@ -124,7 +124,7 @@ const MovieOffers = () => {
       setFilteredDebitCards(debitCards);
       setNoOffersMessage("");
       setSelectedCard("");
-      setMovieOffers([]);
+      setGroceryOffers([]);
       return;
     }
 
@@ -157,105 +157,94 @@ const MovieOffers = () => {
   return (
     <div className="container">
       <div className="title-box">
-        <h1>Movie Offers</h1>
+        <h1>Grocery Offers</h1>
       </div>
 
       <div className="content-row">
         <div className="text-section">
-          <h2>Find the Best Movie Ticket Offers</h2>
+          <h2>Find the Best Grocery Discounts</h2>
           <p>
-            Discover amazing discounts and cashback offers on movie tickets 
+            Discover amazing discounts and cashback offers on groceries 
             using your credit or debit cards. Search for your card to see 
-            available offers from various platforms. Save money on your next 
-            movie outing with these exclusive deals!
+            available offers from various stores.
           </p>
         </div>
         <div className="image-section">
           <img 
-            src="https://via.placeholder.com/400x300?text=Movie+Tickets" 
-            alt="Movie tickets" 
-            className="movie-image"
+            src="https://via.placeholder.com/400x300?text=Grocery+Items" 
+            alt="Grocery items" 
+            className="grocery-image"
           />
         </div>
       </div>
 
       <div className="main">
-        <div className="search-dropdown">
-          <input
-            id="creditCardSearch"
-            type="text"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            placeholder="Type to search..."
-            className="search-input"
-          />
+        <div className="search-container">
+          <div className="search-dropdown">
+            <input
+              id="creditCardSearch"
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search your card..."
+              className="search-input"
+            />
 
-          {(filteredCreditCards.length > 0 || filteredDebitCards.length > 0) && (
-            <ul className="dropdown-list">
-              {filteredCreditCards.length > 0 && (
-                <>
-                  <li style={{ fontWeight: "bold", padding: "10px", backgroundColor: "#f0f0f0" }}>
-                    Credit Cards
-                  </li>
-                  {filteredCreditCards.map((card, index) => (
-                    <li
-                      key={`credit-${index}`}
-                      className="dropdown-item"
-                      onClick={() => handleCardSelect(card)}
-                    >
-                      {card}
-                    </li>
-                  ))}
-                </>
-              )}
+            {(filteredCreditCards.length > 0 || filteredDebitCards.length > 0) && (
+              <ul className="dropdown-list">
+                {filteredCreditCards.length > 0 && (
+                  <>
+                    <li className="dropdown-header">Credit Cards</li>
+                    {filteredCreditCards.map((card, index) => (
+                      <li
+                        key={`credit-${index}`}
+                        className="dropdown-item"
+                        onClick={() => handleCardSelect(card)}
+                      >
+                        {card}
+                      </li>
+                    ))}
+                  </>
+                )}
 
-              {filteredDebitCards.length > 0 && (
-                <>
-                  <li style={{ fontWeight: "bold", padding: "10px", backgroundColor: "#f0f0f0" }}>
-                    Debit Cards
-                  </li>
-                  {filteredDebitCards.map((card, index) => (
-                    <li
-                      key={`debit-${index}`}
-                      className="dropdown-item"
-                      onClick={() => handleCardSelect(card)}
-                    >
-                      {card}
-                    </li>
-                  ))}
-                </>
-              )}
-            </ul>
-          )}
+                {filteredDebitCards.length > 0 && (
+                  <>
+                    <li className="dropdown-header">Debit Cards</li>
+                    {filteredDebitCards.map((card, index) => (
+                      <li
+                        key={`debit-${index}`}
+                        className="dropdown-item"
+                        onClick={() => handleCardSelect(card)}
+                      >
+                        {card}
+                      </li>
+                    ))}
+                  </>
+                )}
+              </ul>
+            )}
+          </div>
         </div>
 
         {noOffersMessage && (
-          <p className="no-offers-message">{noOffersMessage}</p>
+          <div className="message-box">
+            <p>{noOffersMessage}</p>
+          </div>
         )}
 
         {selectedCard && !noOffersMessage && (
-          <div className="offers-section">
-            {movieOffers.length > 0 && (
-              <div>
-                {movieOffers.map((offer, index) => (
-                  <div key={index} className="offers-container">
-                    <h2 className="offers-heading">
-                      <strong>Offers on</strong> {offer.App}
-                    </h2>
-                    <div className="offers-cards-container">
-                      <div className="offer-card">
-                        <p>
-                          <strong>Offer:</strong> {offer["Description of the offer"]}
-                        </p>
-                        <p>
-                          <strong>Coupon Code:</strong> {offer["Coupon Code/Link"]}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          <div className="offers-grid">
+            {groceryOffers.map((offer, index) => (
+              <div key={index} className="offer-card">
+                <h3>{offer.App}</h3>
+                <div className="offer-details">
+                  <p><span className="detail-label">Offer:</span> {offer["Description of the offer"]}</p>
+                  {offer["Coupon Code/Link"] && (
+                    <p><span className="detail-label">Code:</span> {offer["Coupon Code/Link"]}</p>
+                  )}
+                </div>
               </div>
-            )}
+            ))}
           </div>
         )}
       </div>
@@ -263,4 +252,4 @@ const MovieOffers = () => {
   );
 };
 
-export default MovieOffers;
+export default GroceryOffers;

@@ -1,15 +1,15 @@
 /* General styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #F6F4E9;
+  background: linear-gradient(to bottom, #999792, #cecdc9);
   color: #333;
   margin: 0;
   padding: 0;
-  height: 100vh; /* Ensure body takes full viewport height */
   width: 100%;
   display: flex;
   flex-direction: column;
 }
+
 
 /* Container styling */
 .container {
@@ -134,7 +134,7 @@ body {
 
 .offer-card {
   background-color: #39641D;
-  color: white;
+  color: black;
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 15px;
@@ -149,7 +149,7 @@ body {
 
 .offer-card strong {
   font-weight: bold;
-  color: white;
+  color: black;
 }
 
 /* No offers message styling */
@@ -193,6 +193,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
+  width: 800px;
+  height: 60px;
 }
 
 .title-box h1 {
@@ -238,4 +240,39 @@ body {
   .text-section, .image-section {
     width: 100%;
   }
+}
+
+.loading, .error, .message {
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.loading {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.message {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.offer-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.offer-card h3 {
+  margin-top: 0;
+  color: #2c3e50;
 }
