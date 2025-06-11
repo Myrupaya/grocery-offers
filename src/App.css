@@ -1,6 +1,10 @@
 /* General styling */
 body {
   font-family: Arial, sans-serif;
+<<<<<<< HEAD
+=======
+  background: linear-gradient(to bottom, #999792, #cecdc9);
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
   color: #333;
   margin: 0;
   padding: 0;
@@ -9,6 +13,7 @@ body {
   flex-direction: column;
 }
 
+<<<<<<< HEAD
 body{
     @apply min-h-screen;
   background: linear-gradient(to bottom, #999792, #cecdc9);
@@ -203,6 +208,8 @@ body{
     font-size: 14px;
   }
 }
+=======
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
 
 /* Container styling */
 .container {
@@ -342,7 +349,7 @@ body{
 
 .offer-card strong {
   font-weight: bold;
-  color: white;
+  color: black;
 }
 
 /* No offers message styling */
@@ -377,6 +384,7 @@ body{
   }
 }
 
+<<<<<<< HEAD
 /* Base styles */
 .container {
   max-width: 1200px;
@@ -426,10 +434,27 @@ body{
 }
 
 .main-title {
+=======
+/* Add these styles to your existing App.css */
+
+.title-box {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 800px;
+  height: 60px;
+}
+
+.title-box h1 {
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
   color: black;
   margin: 0;
 }
 
+<<<<<<< HEAD
 /* Split section */
 .split-section {
   display: flex;
@@ -440,10 +465,22 @@ body{
 
 .text-section, .image-section {
   flex: 1 1 45%;
+=======
+.content-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.text-section, .image-section {
+  flex: 1;
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
   min-width: 300px;
 }
 
 .text-section h2 {
+<<<<<<< HEAD
   margin-top: 0;
 }
 
@@ -593,4 +630,66 @@ body{
   .search-input {
     font-size: 14px;
   }
+=======
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.text-section p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.movie-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+  .content-row {
+    flex-direction: column;
+  }
+  
+  .text-section, .image-section {
+    width: 100%;
+  }
+}
+
+.loading, .error, .message {
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.loading {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.message {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.offer-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.offer-card h3 {
+  margin-top: 0;
+  color: #2c3e50;
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
 }

@@ -157,6 +157,7 @@ const GroceryOffers = () => {
 
   return (
     <div className="container">
+<<<<<<< HEAD
       {/* Navbar Component - remains exactly the same */}
       <nav className="navbar">
         <div className="logoContainer">
@@ -243,9 +244,80 @@ const GroceryOffers = () => {
               )}
             </ul>
           )}
+=======
+      <div className="title-box">
+        <h1>Grocery Offers</h1>
+      </div>
+
+      <div className="content-row">
+        <div className="text-section">
+          <h2>Find the Best Grocery Discounts</h2>
+          <p>
+            Discover amazing discounts and cashback offers on groceries 
+            using your credit or debit cards. Search for your card to see 
+            available offers from various stores.
+          </p>
+        </div>
+        <div className="image-section">
+          <img 
+            src="https://via.placeholder.com/400x300?text=Grocery+Items" 
+            alt="Grocery items" 
+            className="grocery-image"
+          />
         </div>
       </div>
 
+      <div className="main">
+        <div className="search-container">
+          <div className="search-dropdown">
+            <input
+              id="creditCardSearch"
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search your card..."
+              className="search-input"
+            />
+
+            {(filteredCreditCards.length > 0 || filteredDebitCards.length > 0) && (
+              <ul className="dropdown-list">
+                {filteredCreditCards.length > 0 && (
+                  <>
+                    <li className="dropdown-header">Credit Cards</li>
+                    {filteredCreditCards.map((card, index) => (
+                      <li
+                        key={`credit-${index}`}
+                        className="dropdown-item"
+                        onClick={() => handleCardSelect(card)}
+                      >
+                        {card}
+                      </li>
+                    ))}
+                  </>
+                )}
+
+                {filteredDebitCards.length > 0 && (
+                  <>
+                    <li className="dropdown-header">Debit Cards</li>
+                    {filteredDebitCards.map((card, index) => (
+                      <li
+                        key={`debit-${index}`}
+                        className="dropdown-item"
+                        onClick={() => handleCardSelect(card)}
+                      >
+                        {card}
+                      </li>
+                    ))}
+                  </>
+                )}
+              </ul>
+            )}
+          </div>
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
+        </div>
+      </div>
+
+<<<<<<< HEAD
       {/* Offers display section */}
       {noOffersMessage && (
         <p className="no-offers-message">{noOffersMessage}</p>
@@ -281,6 +353,27 @@ const GroceryOffers = () => {
               Search for your card, find the offer you want, and apply the coupon
               code during checkout at the specified grocery platform.
             </p>
+=======
+        {noOffersMessage && (
+          <div className="message-box">
+            <p>{noOffersMessage}</p>
+          </div>
+        )}
+
+        {selectedCard && !noOffersMessage && (
+          <div className="offers-grid">
+            {groceryOffers.map((offer, index) => (
+              <div key={index} className="offer-card">
+                <h3>{offer.App}</h3>
+                <div className="offer-details">
+                  <p><span className="detail-label">Offer:</span> {offer["Description of the offer"]}</p>
+                  {offer["Coupon Code/Link"] && (
+                    <p><span className="detail-label">Code:</span> {offer["Coupon Code/Link"]}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+>>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
           </div>
           <div className="faq-card">
             <h3>Are these offers valid for all users?</h3>
