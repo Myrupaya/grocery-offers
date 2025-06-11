@@ -157,24 +157,7 @@ const GroceryOffers = () => {
 
   return (
     <div className="container">
-<<<<<<< HEAD
-      {/* Navbar Component - remains exactly the same */}
-      <nav className="navbar">
-        <div className="logoContainer">
-          <a href="https://www.myrupaya.in/">
-            <img
-              src="https://static.wixstatic.com/media/f836e8_26da4bf726c3475eabd6578d7546c3b2~mv2.jpg/v1/crop/x_124,y_0,w_3152,h_1458/fill/w_909,h_420,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/dark_logo_white_background.jpg"
-              alt="MyRupaya Logo"
-              className="logo"
-            />
-          </a>
-          <div className="linksContainer">
-            <a href="https://www.myrupaya.in/" className="link">
-              Home
-            </a>
-          </div>
-        </div>
-      </nav>
+
 
       {/* Title in white container box */}
       <div className="title-container">
@@ -244,80 +227,9 @@ const GroceryOffers = () => {
               )}
             </ul>
           )}
-=======
-      <div className="title-box">
-        <h1>Grocery Offers</h1>
-      </div>
-
-      <div className="content-row">
-        <div className="text-section">
-          <h2>Find the Best Grocery Discounts</h2>
-          <p>
-            Discover amazing discounts and cashback offers on groceries 
-            using your credit or debit cards. Search for your card to see 
-            available offers from various stores.
-          </p>
-        </div>
-        <div className="image-section">
-          <img 
-            src="https://via.placeholder.com/400x300?text=Grocery+Items" 
-            alt="Grocery items" 
-            className="grocery-image"
-          />
         </div>
       </div>
 
-      <div className="main">
-        <div className="search-container">
-          <div className="search-dropdown">
-            <input
-              id="creditCardSearch"
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Search your card..."
-              className="search-input"
-            />
-
-            {(filteredCreditCards.length > 0 || filteredDebitCards.length > 0) && (
-              <ul className="dropdown-list">
-                {filteredCreditCards.length > 0 && (
-                  <>
-                    <li className="dropdown-header">Credit Cards</li>
-                    {filteredCreditCards.map((card, index) => (
-                      <li
-                        key={`credit-${index}`}
-                        className="dropdown-item"
-                        onClick={() => handleCardSelect(card)}
-                      >
-                        {card}
-                      </li>
-                    ))}
-                  </>
-                )}
-
-                {filteredDebitCards.length > 0 && (
-                  <>
-                    <li className="dropdown-header">Debit Cards</li>
-                    {filteredDebitCards.map((card, index) => (
-                      <li
-                        key={`debit-${index}`}
-                        className="dropdown-item"
-                        onClick={() => handleCardSelect(card)}
-                      >
-                        {card}
-                      </li>
-                    ))}
-                  </>
-                )}
-              </ul>
-            )}
-          </div>
->>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
-        </div>
-      </div>
-
-<<<<<<< HEAD
       {/* Offers display section */}
       {noOffersMessage && (
         <p className="no-offers-message">{noOffersMessage}</p>
@@ -343,54 +255,7 @@ const GroceryOffers = () => {
         </div>
       )}
 
-      {/* FAQ section with 3 columns in one row on desktop */}
-      <div className="faq-container">
-        <h2 className="section-title">Frequently Asked Questions</h2>
-        <div className="faq-grid">
-          <div className="faq-card">
-            <h3>How do I use these offers?</h3>
-            <p>
-              Search for your card, find the offer you want, and apply the coupon
-              code during checkout at the specified grocery platform.
-            </p>
-=======
-        {noOffersMessage && (
-          <div className="message-box">
-            <p>{noOffersMessage}</p>
-          </div>
-        )}
-
-        {selectedCard && !noOffersMessage && (
-          <div className="offers-grid">
-            {groceryOffers.map((offer, index) => (
-              <div key={index} className="offer-card">
-                <h3>{offer.App}</h3>
-                <div className="offer-details">
-                  <p><span className="detail-label">Offer:</span> {offer["Description of the offer"]}</p>
-                  {offer["Coupon Code/Link"] && (
-                    <p><span className="detail-label">Code:</span> {offer["Coupon Code/Link"]}</p>
-                  )}
-                </div>
-              </div>
-            ))}
->>>>>>> 9977f3031a2ae1df83d5a5541d5a93a944a1ad29
-          </div>
-          <div className="faq-card">
-            <h3>Are these offers valid for all users?</h3>
-            <p>
-              Most offers are valid for cardholders, but some may have additional
-              terms and conditions specified by the bank.
-            </p>
-          </div>
-          <div className="faq-card">
-            <h3>How often are offers updated?</h3>
-            <p>
-              We update our database regularly with new offers. Check back
-              frequently for the latest grocery shopping promotions.
-            </p>
-          </div>
-        </div>
-      </div>
+ 
     </div>
   );
 };
