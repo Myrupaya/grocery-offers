@@ -3,13 +3,16 @@ import Papa from "papaparse";
 import "./App.css";
 
 const GroceryOffers = () => {
-    const [creditCards, setCreditCards] = useState([]);
+  const [creditCards, setCreditCards] = useState([]);
   const [debitCards, setDebitCards] = useState([]);
+  const [premiumCards, setPremiumCards] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCreditCards, setFilteredCreditCards] = useState([]);
   const [filteredDebitCards, setFilteredDebitCards] = useState([]);
+  const [filteredPremiumCards, setFilteredPremiumCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState("");
   const [groceryOffers, setGroceryOffers] = useState([]);
+  const [premiumOffers, setPremiumOffers] = useState([]);
   const [noOffersMessage, setNoOffersMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -27,7 +30,7 @@ const GroceryOffers = () => {
     };
   }, []);
 
-  // Fetch and parse CSV file
+  // Fetch and parse CSV files
   useEffect(() => {
     const fetchAndParseCSV = (filePath) =>
       new Promise((resolve, reject) => {
@@ -39,11 +42,13 @@ const GroceryOffers = () => {
         });
       });
 
-    const extractCards = (data) => {
+    const extractCards = (groceryData, premiumData) => {
       const creditCards = new Set();
       const debitCards = new Set();
+      const premiumCards = new Set();
 
-      data.forEach((row) => {
+      // Extract from grocery offers
+      groceryData.forEach((row) => {
         if (row["Applicable Credit Card"]) {
           row["Applicable Credit Card"]
             .split(",")
@@ -58,22 +63,38 @@ const GroceryOffers = () => {
         }
       });
 
+      // Extract from premium cards - using "Credit Card Name" column
+      premiumData.forEach((row) => {
+        if (row["Credit Card Name"] && row["Credit Card Name"].trim() !== "") {
+          premiumCards.add(row["Credit Card Name"].trim());
+        }
+      });
+
       return {
-        creditCards: Array.from(creditCards),
-        debitCards: Array.from(debitCards),
+        creditCards: Array.from(creditCards).filter(Boolean),
+        debitCards: Array.from(debitCards).filter(Boolean),
+        premiumCards: Array.from(premiumCards).filter(Boolean),
       };
     };
 
     const fetchData = async () => {
       try {
-        const groceryData = await fetchAndParseCSV("/Corrected_Grocery_Offers.csv");
-        const { creditCards, debitCards } = extractCards(groceryData);
+        const [groceryData, premiumData] = await Promise.all([
+          fetchAndParseCSV("/Corrected_Grocery_Offers.csv"),
+          fetchAndParseCSV("/Credit Card.csv"),
+        ]);
+        
+        const { creditCards, debitCards, premiumCards } = extractCards(groceryData, premiumData);
         setCreditCards(creditCards);
         setDebitCards(debitCards);
+        setPremiumCards(premiumCards);
         setFilteredCreditCards(creditCards);
         setFilteredDebitCards(debitCards);
+        setFilteredPremiumCards(premiumCards);
+        
+        console.log("Premium cards loaded:", premiumCards); // Debug log
       } catch (error) {
-        console.error("Error fetching or parsing CSV file:", error);
+        console.error("Error fetching or parsing CSV files:", error);
       }
     };
 
@@ -92,19 +113,31 @@ const GroceryOffers = () => {
         });
       });
 
-    const filterOffers = (data, card) =>
+    const filterGroceryOffers = (data, card) =>
       data.filter(
         (row) =>
           row["Applicable Credit Card"]?.includes(card) ||
           row["Applicable Debit Card"]?.includes(card)
       );
 
-    try {
-      const groceryData = await fetchAndParseCSV("/Corrected_Grocery_Offers.csv");
-      const filteredOffers = filterOffers(groceryData, card);
-      setGroceryOffers(filteredOffers);
+    const filterPremiumOffers = (data, card) =>
+      data.filter((row) => 
+        row["Credit Card Name"]?.trim() === card
+      );
 
-      if (filteredOffers.length === 0) {
+    try {
+      const [groceryData, premiumData] = await Promise.all([
+        fetchAndParseCSV("/Corrected_Grocery_Offers.csv"),
+        fetchAndParseCSV("/Credit Card.csv"),
+      ]);
+      
+      const filteredGroceryOffers = filterGroceryOffers(groceryData, card);
+      const filteredPremiumOffers = filterPremiumOffers(premiumData, card);
+      
+      setGroceryOffers(filteredGroceryOffers);
+      setPremiumOffers(filteredPremiumOffers);
+
+      if (filteredGroceryOffers.length === 0 && filteredPremiumOffers.length === 0) {
         setNoOffersMessage("No offers found for this card.");
       } else {
         setNoOffersMessage("");
@@ -122,9 +155,11 @@ const GroceryOffers = () => {
     if (value === "") {
       setFilteredCreditCards(creditCards);
       setFilteredDebitCards(debitCards);
+      setFilteredPremiumCards(premiumCards);
       setNoOffersMessage("");
       setSelectedCard("");
       setGroceryOffers([]);
+      setPremiumOffers([]);
       return;
     }
 
@@ -134,11 +169,15 @@ const GroceryOffers = () => {
     const matchingDebitCards = debitCards.filter((card) =>
       card.toLowerCase().includes(value.toLowerCase())
     );
+    const matchingPremiumCards = premiumCards.filter((card) =>
+      card.toLowerCase().includes(value.toLowerCase())
+    );
 
     setFilteredCreditCards(matchingCreditCards);
     setFilteredDebitCards(matchingDebitCards);
+    setFilteredPremiumCards(matchingPremiumCards);
 
-    if (matchingCreditCards.length === 0 && matchingDebitCards.length === 0) {
+    if (matchingCreditCards.length === 0 && matchingDebitCards.length === 0 && matchingPremiumCards.length === 0) {
       setNoOffersMessage("No offers found for this card.");
     } else {
       setNoOffersMessage("");
@@ -151,14 +190,12 @@ const GroceryOffers = () => {
     setSearchTerm(card);
     setFilteredCreditCards([]);
     setFilteredDebitCards([]);
+    setFilteredPremiumCards([]);
     fetchOffers(card);
   };
 
-
   return (
     <div className="container">
-
-
       {/* Centered search and dropdown section */}
       <div className="search-container">
         <div className="search-section">
@@ -170,7 +207,7 @@ const GroceryOffers = () => {
             className="search-input"
           />
 
-          {(filteredCreditCards.length > 0 || filteredDebitCards.length > 0) && (
+          {(filteredCreditCards.length > 0 || filteredDebitCards.length > 0 || filteredPremiumCards.length > 0) && (
             <ul className="dropdown-list">
               {filteredCreditCards.length > 0 && (
                 <>
@@ -201,6 +238,21 @@ const GroceryOffers = () => {
                   ))}
                 </>
               )}
+
+              {filteredPremiumCards.length > 0 && (
+                <>
+                  <li className="dropdown-header">Premium Cards</li>
+                  {filteredPremiumCards.map((card, index) => (
+                    <li
+                      key={`premium-${index}`}
+                      className="dropdown-item"
+                      onClick={() => handleCardSelect(card)}
+                    >
+                      {card}
+                    </li>
+                  ))}
+                </>
+              )}
             </ul>
           )}
         </div>
@@ -213,25 +265,45 @@ const GroceryOffers = () => {
 
       {selectedCard && !noOffersMessage && (
         <div className="offers-container">
+          {/* Regular offers section */}
           {groceryOffers.length > 0 && (
-            <div className="offers-grid">
-              {groceryOffers.map((offer, index) => (
-                <div key={index} className="offer-card">
-                  <h3>Offers on {offer.App}</h3>
-                  <p>
-                    <strong>Offer:</strong> {offer["Description of the offer"]}
-                  </p>
-                  <p>
-                    <strong>Coupon Code:</strong> {offer["Coupon Code/Link"]}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <>
+              <h2 className="offers-heading">Current Offers</h2>
+              <div className="offers-grid">
+                {groceryOffers.map((offer, index) => (
+                  <div key={index} className="offer-card">
+                    <h3>Offers on {offer.App}</h3>
+                    <p>
+                      <strong>Offer:</strong> {offer["Description of the offer"]}
+                    </p>
+                    <p>
+                      <strong>Coupon Code:</strong> {offer["Coupon Code/Link"]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Permanent offers section */}
+          {premiumOffers.length > 0 && (
+            <>
+              <h2 className="offers-heading">Permanent Offers</h2>
+              <div className="offers-grid">
+                {premiumOffers.map((offer, index) => (
+                  <div key={`premium-${index}`} className="offer-card">
+                    <h3>{offer["Credit Card Name"]}</h3>
+                    <p>
+                      <strong>Grocery/Departmental Store Benefits:</strong>{" "}
+                      {offer["Grocery/Departmental Store Benefits"]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
-
- 
     </div>
   );
 };
