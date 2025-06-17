@@ -159,30 +159,6 @@ const GroceryOffers = () => {
     <div className="container">
 
 
-      {/* Title in white container box */}
-      <div className="title-container">
-        <h1 className="main-title">Grocery Offers</h1>
-      </div>
-
-      {/* 50-50 split section - now responsive */}
-      <div className="split-section">
-        <div className="text-section">
-          <h2>Find the best grocery offers</h2>
-          <p>
-            Discover exclusive credit and debit card offers for grocery shopping.
-            Search for your card to see available discounts and promo codes that
-            can help you save money on your grocery purchases.
-          </p>
-        </div>
-        <div className="image-section">
-          <img
-            src="https://via.placeholder.com/500x300?text=Grocery+Shopping"
-            alt="Grocery Shopping"
-            className="responsive-image"
-          />
-        </div>
-      </div>
-
       {/* Centered search and dropdown section */}
       <div className="search-container">
         <div className="search-section">
