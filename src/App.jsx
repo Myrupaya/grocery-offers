@@ -12,8 +12,8 @@ const LIST_FIELDS = {
   link: ["Link", "Offer Link"],
   desc: ["Description", "Details", "Offer Description", "Flight Benefit"],
   // Permanent (inbuilt) CSV fields
-  permanentCCName: ["Credit Card Name"],
-  permanentBenefit: ["Flight Benefit", "Benefit", "Offer", "Hotel Benefit"],
+  permanentCCName: ["Eligible Credit Cards"],
+  permanentBenefit: ["Grocery Benefits", "Benefit", "Offer", "Hotel Benefit"],
 };
 
 const MAX_SUGGESTIONS = 50;
@@ -29,6 +29,10 @@ const VARIANT_NOTE_SITES = new Set([
   "Goibibo",
   "Airline",
   "Permanent",
+  // 🔹 Added for your new CSVs:
+  "Amazon Fresh",
+  "BigBasket",
+  "Blinkit",
 ]);
 
 /** -------------------- HELPERS -------------------- */
@@ -190,15 +194,10 @@ const AirlineOffers = () => {
   const [noMatches, setNoMatches] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // offers
-  const [easeOffers, setEaseOffers] = useState([]);
-  const [yatraDomesticOffers, setYatraDomesticOffers] = useState([]);
-  const [yatraInternationalOffers, setYatraInternationalOffers] = useState([]);
-  const [ixigoOffers, setIxigoOffers] = useState([]);
-  const [airlineOffers, setAirlineOffers] = useState([]);
-  const [makeMyTripOffers, setMakeMyTripOffers] = useState([]);
-  const [clearTripOffers, setClearTripOffers] = useState([]);
-  const [goibiboOffers, setGoibiboOffers] = useState([]);
+  // offers (ONLY these 4 CSVs)
+  const [amazonOffers, setAmazonOffers] = useState([]);
+  const [bigBasketOffers, setBigBasketOffers] = useState([]);
+  const [blinkitOffers, setBlinkitOffers] = useState([]);
   const [permanentOffers, setPermanentOffers] = useState([]);
 
   // responsive
@@ -265,20 +264,15 @@ const AirlineOffers = () => {
     loadAllCards();
   }, []);
 
-  // 2) Load all offer CSVs
+  // 2) Load offer CSVs (ONLY: permanent_offers, amazon, bigbasket, blinkit)
   useEffect(() => {
     async function loadOffers() {
       try {
         const files = [
-          { name: "easeMyTrip.csv", setter: setEaseOffers },
-          { name: "yatraDomestic.csv", setter: setYatraDomesticOffers },
-          { name: "yatraInternational.csv", setter: setYatraInternationalOffers },
-          { name: "ixigo.csv", setter: setIxigoOffers },
-          { name: "airline.csv", setter: setAirlineOffers },
-          { name: "makemytrip.csv", setter: setMakeMyTripOffers },
-          { name: "cleartrip.csv", setter: setClearTripOffers },
-          { name: "goibibo.csv", setter: setGoibiboOffers },
-          { name: "permanent.csv", setter: setPermanentOffers },
+          { name: "amazon.csv", setter: setAmazonOffers },
+          { name: "bigbasket.csv", setter: setBigBasketOffers },
+          { name: "blinkit.csv", setter: setBlinkitOffers },
+          { name: "permanent_offers.csv", setter: setPermanentOffers },
         ];
 
         await Promise.all(
@@ -318,15 +312,10 @@ const AirlineOffers = () => {
       }
     };
 
-    // Provider files
-    harvestRows(easeOffers);
-    harvestRows(yatraDomesticOffers);
-    harvestRows(yatraInternationalOffers);
-    harvestRows(ixigoOffers);
-    harvestRows(airlineOffers);
-    harvestRows(makeMyTripOffers);
-    harvestRows(clearTripOffers);
-    harvestRows(goibiboOffers);
+    // 🔹 Retail files
+    harvestRows(amazonOffers);
+    harvestRows(bigBasketOffers);
+    harvestRows(blinkitOffers);
 
     // Permanent credit cards (credit only)
     for (const o of permanentOffers || []) {
@@ -340,17 +329,7 @@ const AirlineOffers = () => {
 
     setChipCC(Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b)));
     setChipDC(Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b)));
-  }, [
-    easeOffers,
-    yatraDomesticOffers,
-    yatraInternationalOffers,
-    ixigoOffers,
-    airlineOffers,
-    makeMyTripOffers,
-    clearTripOffers,
-    goibiboOffers,
-    permanentOffers,
-  ]);
+  }, [amazonOffers, bigBasketOffers, blinkitOffers, permanentOffers]);
 
   /** search box */
   const onChangeQuery = (e) => {
@@ -448,44 +427,39 @@ const AirlineOffers = () => {
 
   // Collect then global-dedup by priority
   const wPermanent = matchesFor(permanentOffers, "permanent", "Permanent");
-  const wAirline = matchesFor(airlineOffers, selected?.type === "debit" ? "debit" : "credit", "Airline");
-  const wGoibibo = matchesFor(goibiboOffers, selected?.type === "debit" ? "debit" : "credit", "Goibibo");
-  const wEase = matchesFor(easeOffers, selected?.type === "debit" ? "debit" : "credit", "EaseMyTrip");
-  const wYDom = matchesFor(yatraDomesticOffers, selected?.type === "debit" ? "debit" : "credit", "Yatra (Domestic)");
-  const wYInt = matchesFor(yatraInternationalOffers, selected?.type === "debit" ? "debit" : "credit", "Yatra (International)");
-  const wIxigo = matchesFor(ixigoOffers, selected?.type === "debit" ? "debit" : "credit", "Ixigo");
-  const wMMT = matchesFor(makeMyTripOffers, selected?.type === "debit" ? "debit" : "credit", "MakeMyTrip");
-  const wCT = matchesFor(clearTripOffers, selected?.type === "debit" ? "debit" : "credit", "ClearTrip");
+  const wAmazon = matchesFor(amazonOffers, selected?.type === "debit" ? "debit" : "credit", "Amazon Fresh");
+  const wBigBasket = matchesFor(bigBasketOffers, selected?.type === "debit" ? "debit" : "credit", "BigBasket");
+  const wBlinkit = matchesFor(blinkitOffers, selected?.type === "debit" ? "debit" : "credit", "Blinkit");
 
   const seen = new Set();
-  const dPermanent = selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : []; // permanent for credit only
-  const dAirline = dedupWrappers(wAirline, seen);
-  const dGoibibo = dedupWrappers(wGoibibo, seen);
-  const dEase = dedupWrappers(wEase, seen);
-  const dYDom = dedupWrappers(wYDom, seen);
-  const dYInt = dedupWrappers(wYInt, seen);
-  const dIxigo = dedupWrappers(wIxigo, seen);
-  const dMMT = dedupWrappers(wMMT, seen);
-  const dCT = dedupWrappers(wCT, seen);
+  const dPermanent = selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : []; // permanent for credit only (same as before)
+  const dAmazon = dedupWrappers(wAmazon, seen);
+  const dBigBasket = dedupWrappers(wBigBasket, seen);
+  const dBlinkit = dedupWrappers(wBlinkit, seen);
 
   const hasAny = Boolean(
-    dPermanent.length ||
-      dAirline.length ||
-      dGoibibo.length ||
-      dEase.length ||
-      dYDom.length ||
-      dYInt.length ||
-      dIxigo.length ||
-      dMMT.length ||
-      dCT.length
+    dPermanent.length || dAmazon.length || dBigBasket.length || dBlinkit.length
   );
 
   /** Offer card UI */
-  const OfferCard = ({ wrapper, isPermanent }) => {
+  const OfferCard = ({ wrapper, isPermanent, isRetail }) => {
     const o = wrapper.offer;
-    const title = firstField(o, LIST_FIELDS.title) || o.Website || "Offer";
+
+    // For retail CSVs: Offer -> Description -> Eligible
+    let title, desc, eligible;
+    if (isRetail) {
+      title = o["Offer"] || "Offer";
+      desc = o["Description"] || "";
+      const ec = o["Eligible Credit Cards"] || "";
+      const ed = o["Eligible Debit Cards"] || "";
+      const elig = [ec, ed].filter(Boolean).join("  ");
+      eligible = elig.trim();
+    } else {
+      title = firstField(o, LIST_FIELDS.title) || o.Website || "Offer";
+      desc = firstField(o, LIST_FIELDS.desc);
+    }
+
     const image = firstField(o, LIST_FIELDS.image);
-    const desc = firstField(o, LIST_FIELDS.desc);
     const link = firstField(o, LIST_FIELDS.link);
 
     const showVariantNote =
@@ -511,6 +485,13 @@ const AirlineOffers = () => {
           ) : (
             desc && <p className="offer-desc">{desc}</p>
           )}
+
+          {/* Retail eligible line (after description)
+          {isRetail && eligible && (
+            <p className="offer-desc">
+              <strong>Eligible:</strong> {eligible}
+            </p>
+          )} */}
 
           {showVariantNote && (
             <p className="network-note">
@@ -705,89 +686,34 @@ const AirlineOffers = () => {
             </div>
           )}
 
-          {!!dAirline.length && (
+          {!!dAmazon.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Airline Offers</h2>
+              <h2 style={{ textAlign: "center" }}>Offers On Amazon Fresh</h2>
               <div className="offer-grid">
-                {dAirline.map((w, i) => (
-                  <OfferCard key={`air-${i}`} wrapper={w} />
+                {dAmazon.map((w, i) => (
+                  <OfferCard key={`amz-${i}`} wrapper={w} isRetail />
                 ))}
               </div>
             </div>
           )}
 
-          {!!dGoibibo.length && (
+          {!!dBigBasket.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Goibibo</h2>
+              <h2 style={{ textAlign: "center" }}>Offers On BigBasket</h2>
               <div className="offer-grid">
-                {dGoibibo.map((w, i) => (
-                  <OfferCard key={`go-${i}`} wrapper={w} />
+                {dBigBasket.map((w, i) => (
+                  <OfferCard key={`bb-${i}`} wrapper={w} isRetail />
                 ))}
               </div>
             </div>
           )}
 
-          {!!dEase.length && (
+          {!!dBlinkit.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on EaseMyTrip</h2>
+              <h2 style={{ textAlign: "center" }}>Offers On Blinkit</h2>
               <div className="offer-grid">
-                {dEase.map((w, i) => (
-                  <OfferCard key={`emt-${i}`} wrapper={w} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!!dYDom.length && (
-            <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Yatra (Domestic)</h2>
-              <div className="offer-grid">
-                {dYDom.map((w, i) => (
-                  <OfferCard key={`yd-${i}`} wrapper={w} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!!dYInt.length && (
-            <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Yatra (International)</h2>
-              <div className="offer-grid">
-                {dYInt.map((w, i) => (
-                  <OfferCard key={`yi-${i}`} wrapper={w} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!!dIxigo.length && (
-            <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Ixigo</h2>
-              <div className="offer-grid">
-                {dIxigo.map((w, i) => (
-                  <OfferCard key={`ix-${i}`} wrapper={w} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!!dMMT.length && (
-            <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on MakeMyTrip</h2>
-              <div className="offer-grid">
-                {dMMT.map((w, i) => (
-                  <OfferCard key={`mmt-${i}`} wrapper={w} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!!dCT.length && (
-            <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on ClearTrip</h2>
-              <div className="offer-grid">
-                {dCT.map((w, i) => (
-                  <OfferCard key={`ct-${i}`} wrapper={w} />
+                {dBlinkit.map((w, i) => (
+                  <OfferCard key={`bl-${i}`} wrapper={w} isRetail />
                 ))}
               </div>
             </div>
@@ -807,7 +733,7 @@ const AirlineOffers = () => {
           style={{
             position: "fixed",
             right: 20,
-            bottom: isMobile ? 20 : 150,
+            bottom: isMobile ? 220 : 250,
             padding: isMobile ? "12px 15px" : "10px 20px",
             backgroundColor: "#1e7145",
             color: "white",

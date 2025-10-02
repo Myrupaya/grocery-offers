@@ -1,14 +1,200 @@
-Offer Title,Description,Eligible Credit Cards,Eligible Debit Cards
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Virtual Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Global International Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Platinum International Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI My Card International Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI IOCL Co-Branded Contactless RuPay Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Gold International Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Nari Shakti Platinum Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Pragati Platinum Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI Mastercard World Debit Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,HPCL Co-Branded Debit Card -Everyday Card
-BigBasket  10% instant discount (code SBI100DC),"10% off up to 200 on min 1,399; valid 11-Aug-2025 to 30-Sep-2025; once per card per month. (State Bank of India)",,SBI One Touch Debit Card
-BigBasket  500 off (code AXISSELECTCC),"Flat 500 off once per month on min 2,500; effective 20-Jun-2025 (ongoing). (Axis Bank)",Axis Bank Select Credit Card,
-BigBasket  up to 20% off (monthly),"Up to 20% off, min txn 2,000, max 500; 1 txn/month; valid 1st25th of every month (Pioneer/Delightful BigBasket offer). (bank.indusind.com)",,Indusind Bank Pioneer Infinite Debit Card
+Offer,Description,Eligible Credit Cards,Eligible Debit Cards
+INDUS20DC,Get 20% instant discount using select IndusInd Bank Debit Cards on orders above Rs.1999. Max discount Rs.500.,,Indusind Bank Pioneer Infinite Debit Card
+AXISSELECTCC,Flat Rs.500 off on orders above Rs.2500 using Axis Bank Select Credit Cards.,Axis Bank Select Credit Card,
+AUIVYDC,Get 10% instant discount using AU Small Finance Bank IVY Debit Cards on orders above Rs.2000. Max discount Rs.300.,,AU Ivy Eternity Royale Debit Card
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Airtel Axis Bank Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Airtel Axis Bank RuPay Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Ace Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Atlas Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Aura Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Freecharge Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Freecharge Plus Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Horizon Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank MY Zone Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Magnus Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Miles And More World Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Miles And More World Select Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank My Wings Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Neo Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Neo Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Platinum Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Pride Platinum Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Pride Signature Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Privilege Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Privilege Easy Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Reserve Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Rewards Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Select Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Shoppers Stop Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Signature Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank SpiceJet Voyage Black Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Titanium Smart Traveller Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Vistara Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Vistara Infinite Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Bank Vistara Signature Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Horizon Mastercard Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis Insta Easy Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Axis KWIK Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Fibe Axis Bank Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Flipkart Axis Bank Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Flipkart Axis Bank Superelite Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,IndianOil Axis Bank Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,LIC Axis Bank Platinum Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,LIC Axis Bank Signature Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Samsung Axis Bank Infinite Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Samsung Axis Bank Signature Credit Card,
+AXISCC,Get 10% instant discount using Axis Bank Credit Cards on orders above Rs.1999. Max discount Rs.250.,Spicejet Axis Bank Voyage Credit Card,
+CB200DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.1200. Max discount Rs.200.,,Central Bank Rupay Select Wellness Card
+CB200DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.1200. Max discount Rs.200.,,Central Bank Rupay Platinum Debit Card
+CB200DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.1200. Max discount Rs.200.,,Central Bank Rupay Classic Debit Card
+CB200DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.1200. Max discount Rs.200.,,Central Bank Business Card
+CB200DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.1200. Max discount Rs.200.,,Central Bank Visa Platinum Card
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Cred IndusInd Rupay Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Bank Club Vistara Explorer Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Bank Platinum RuPay Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Celesta American Express Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Eazydiner Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Intermiles Odyssey Visa Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Pioneer Legacy Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd Tiger Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,IndusInd ePay Amex Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Bank Avios Visa Infinite Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Bank Nexxt Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Crest Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Eazydiner Platinum Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Indulge Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Indus Solitaire Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind InterMiles Odyssey Amex Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Legend Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Pinnacle Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Pioneer Heritage Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Platinum Aura Edge Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Platinum Visa Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Indusind Samman RuPay Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Intermiles Amex Voyage Credit Card,
+INDUSCC,Get 10% instant discount using IndusInd Bank Credit Cards on orders above Rs.699. Max discount Rs.200.,Poonawalla Fincorp IndusInd Bank eLITE RuPay Credit Card,
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Royale Business Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Visa Business Gold Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Royale Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Visa Gold Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Platinum Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Royale World Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU RuPay Platinum Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU RuPay Classic Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Visa Business Platinum Debit Card
+AUSFBDC,Get 10% instant discount using AU Small Finance Bank Debit Cards on orders above Rs.1500. Max discount Rs.200.,,AU Mastercard Platinum Debit Card
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC Bank First Millennia Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Ashva Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Classic Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Earn RuPay Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Power Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Power+ Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Private Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First SWYP Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Select Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Wealth Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC First Wow Credit Card,
+IDFCCC,Flat Rs.150 off on orders above Rs.2000 with IDFC Credit Cards.,IDFC Mayura Credit Card,
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC First Private Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC First Wealth Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC First Select Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC World Debit Mastercard Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC Visa Signature Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC Visa Platinum Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC Visa Classic Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC RuPay Platinum Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC RuPay Classic Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC Visa Platinum Business Debit Card
+IDFCDC,Flat Rs.150 off on orders above Rs.2000 with IDFC Debit Cards.,,IDFC Visa Signature Business Debit Card
+INDUS10DC,Get 10% instant discount on select IndusInd Bank Debit Cards on orders above Rs.999. Max discount Rs.150.,,IndusInd Delights Debit Card
+INDUS10DC,Get 10% instant discount on select IndusInd Bank Debit Cards on orders above Rs.999. Max discount Rs.150.,,IndusInd Visa Signature Debit Card
+INDUS10DC,Get 10% instant discount on select IndusInd Bank Debit Cards on orders above Rs.999. Max discount Rs.150.,,IndusInd World Delights Debit Card
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS Signature Visa Debit Card
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS EaseMyTrip Green (Visa Signature)
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS Visa Infinite Debit Card (Treasures)
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS Visa Business Debit Card
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS Visa Platinum
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS Visa Classic
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS BigBasket Visa Classic
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS RuPay Platinum
+DBSDC,Flat Rs.100 instant discount using DBS Bank Debit Cards on orders above Rs.999.,,DBS RuPay Classic
+IDBICC,"Flat 10% off on IDBI Credit Cards for orders above Rs.599, up to Rs.100.",IDBI Aspire Platinum,
+IDBICC,"Flat 10% off on IDBI Credit Cards for orders above Rs.599, up to Rs.100.",IDBI Aspire Platinum,
+IDBICC,"Flat 10% off on IDBI Credit Cards for orders above Rs.599, up to Rs.100.",IDBI Imperium Platinum,
+IDBICC,"Flat 10% off on IDBI Credit Cards for orders above Rs.599, up to Rs.100.",IDBI Royale Signature Credit Card,
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Signature PayWave Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Platinum PayWave Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Platinum Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Gold Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank Mastercard Gold Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Platinum NCMC Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Classic NCMC Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Classic PayWave Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank Mastercard Classic Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Classic Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Women's PayWave Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Women's Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Being Me PayWave Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank VISA Kids PayWave Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Kids Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Mudra Debit Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay Kisan Card
+IDBIDC,"Flat 10% off on IDBI Debit Cards for orders above Rs.599, up to Rs.100.",,IDBI Bank RuPay PMJDY Card
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Assam Rifles The Sentinel Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,BOB Assure Credit Card,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Bank of Baroda EASY Credit Card,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Bank of Baroda ETERNA Credit card,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Bank of Baroda Premier Credit Card,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Bobcard Select,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,CMA One Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Eterna Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,HPCL BoB ENERGIE,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,ICAI Exclusive Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,ICSI Diamond Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,IRCTC Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Indian Army Yoddha Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Indian Coast Guard Rakshamah Bank of Baroda,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Indian Navy Varunah Premium Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Prime Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Snapdeal Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Swavlamban Bobcard,
+BOBCCNOW,Get 10% instant discount using BOBCARD on orders above Rs.600. Max discount Rs.100.,Unnati Bobcard,
+CB100DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.600. Max discount Rs.100.,,Central Bank Rupay Select Wellness Card
+CB100DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.600. Max discount Rs.100.,,Central Bank Rupay Platinum Debit Card
+CB100DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.600. Max discount Rs.100.,,Central Bank Rupay Classic Debit Card
+CB100DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.600. Max discount Rs.100.,,Central Bank Business Card
+CB100DC,Get 10% instant discount using Central Bank of India Debit Cards on orders above Rs.600. Max discount Rs.100.,,Central Bank Visa Platinum Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Rupay Select Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Mastercard World Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canra Bank Visa Platinum Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Rupay Platinum International Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Mastercard World NRI Platina Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Visa Classic Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Rupay Platinum Domestic Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Mastercard Platinum Women Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Mastercard Platinum Millennial Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Rupay Classic Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Mastercard Platinum Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank Mastercard Business Debit Card
+VISACBDC,Flat Rs.75 off using Canara Bank Debit Cards on orders above Rs.899.,,Canara Bank MasterCard Standard Debit Card
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Assam Rifles The Sentinel Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,BOB Assure Credit Card,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Bank of Baroda EASY Credit Card,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Bank of Baroda ETERNA Credit card,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Bank of Baroda Premier Credit Card,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Bobcard Select,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,CMA One Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Eterna Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,HPCL BoB ENERGIE,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,ICAI Exclusive Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,ICSI Diamond Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,IRCTC Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Indian Army Yoddha Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Indian Coast Guard Rakshamah Bank of Baroda,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Indian Navy Varunah Premium Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Prime Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Snapdeal Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Swavlamban Bobcard,
+BOBC,Get 10% instant discount on BOBCARD on orders above Rs.3000. Max discount Rs.300.,Unnati Bobcard,
+NeuCard 5% Savings,Pay using Tata Neu HDFC Bank Credit Card & get up to 5% NeuCoins (no minimum order value required).,Tata Neu Infinity HDFC Bank Credit Card,
+NeuCard 5% Savings,Pay using Tata Neu HDFC Bank Credit Card & get up to 5% NeuCoins (no minimum order value required).,Tata Neu Plus HDFC Bank Credit Card,
