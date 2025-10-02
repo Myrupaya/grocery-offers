@@ -10,7 +10,7 @@ body{
 .App{ text-align:center; padding:20px; }
 
 /* ----------------  Section & Titles  ---------------- */
-.offers-section{margin:0 auto; padding:20px; }
+.offers-section{ max-width:1200px; margin:0 auto; padding:20px; }
 
 .offer-group{ margin:24px 0 8px; }
 .offer-group > h2{
@@ -23,25 +23,20 @@ body{
 /* ----------------  Grid & Cards  ---------------- */
 .offer-grid{
   display:grid;
+  /* Left-starting grid on desktop; cards stretch to column width */
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap:32px;
-  justify-items: stretch;     /* grid areas stretch full column width */
+  justify-items:stretch;            /* cards take full column width */
   align-items:stretch;
 }
+
 .offer-card{
   background:#fff;
   border-radius:12px;
   border:1px solid #eee;
   box-shadow:0 6px 18px rgba(0,0,0,0.07);
   overflow:hidden;
-  width:100%;                 /* was 90% — now fills column */
-  margin:0;                   /* ensure no centering by margin */
-}
-
-.dropdown{
-  position: relative;
-  max-width: 600px;
-  margin: 20px auto;         /* centers it */
+  width:90%;                       /* no fixed max-width; let grid control width */
 }
 
 .offer-card img{
@@ -49,22 +44,6 @@ body{
   height:220px;
   object-fit:cover;
   display:block;
-}
-
-.coupon-row{
-  display:flex;
-  align-items:center;
-  justify-content:center;     /* center horizontally */
-  gap:8px;
-  margin:8px 0;
-}
-
-.coupon-code{
-  padding:6px 10px;
-  border:1px dashed #ccc;
-  border-radius:6px;
-  font-size:14px;
-  background:#f9f9f9;
 }
 
 .offer-info{

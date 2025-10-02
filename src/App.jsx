@@ -8,27 +8,27 @@ const LIST_FIELDS = {
   credit: ["Eligible Credit Cards", "Eligible Cards"],
   debit: ["Eligible Debit Cards", "Applicable Debit Cards"],
   title: ["Offer Title", "Title"],
-  image: ["Image", "Credit Card Image", "Offer Image", "image"],
+  image: ["Image", "Credit Card Image", "Offer Image", "image", "Image URL"],
   link: ["Link", "Offer Link"],
   desc: ["Description", "Details", "Offer Description", "Flight Benefit"],
-  coupon: ["Coupon Code", "Coupon", "Code"],
-
   // Permanent (inbuilt) CSV fields
-  permanentCCName: ["Eligible Credit Cards"],
-  permanentBenefit: ["Grocery Benefits", "Grocery Benefit", "Benefit", "Offer", "Hotel Benefit"],
+  permanentCCName: ["Credit Card Name"],
+  permanentBenefit: ["Flight Benefit", "Benefit", "Offer", "Hotel Benefit"],
 };
 
 const MAX_SUGGESTIONS = 50;
 
-/** Sites that show the red per-card “Applicable only on {variant} variant” note
- *  (unchanged per your request)
- */
+/** Sites that should display the red per-card “Applicable only on {variant} variant” note */
 const VARIANT_NOTE_SITES = new Set([
-   "Amazon Fresh",
-  "Bigbasket",
-  "Blinkit",
-  "Swiggy Instamart",
-  "Zepto",
+  "EaseMyTrip",
+  "Yatra (Domestic)",
+  "Yatra (International)",
+  "Ixigo",
+  "MakeMyTrip",
+  "ClearTrip",
+  "Goibibo",
+  "Airline",
+  "Permanent",
 ]);
 
 /** -------------------- HELPERS -------------------- */
@@ -95,7 +95,8 @@ function brandCanonicalize(text) {
 function lev(a, b) {
   a = toNorm(a);
   b = toNorm(b);
-  const n = a.length, m = b.length;
+  const n = a.length,
+    m = b.length;
   if (!n) return m;
   if (!m) return n;
   const d = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
@@ -173,10 +174,14 @@ const Disclaimer = () => (
 );
 
 /** -------------------- COMPONENT -------------------- */
-const HotelOffers = () => {
+const AirlineOffers = () => {
   // dropdown data (from allCards.csv ONLY)
   const [creditEntries, setCreditEntries] = useState([]);
   const [debitEntries, setDebitEntries] = useState([]);
+
+  // 🔹 chip strips (from offer CSVs ONLY — NOT allCards.csv)
+  const [chipCC, setChipCC] = useState([]); // credit bases
+  const [chipDC, setChipDC] = useState([]); // debit bases
 
   // ui state
   const [filteredCards, setFilteredCards] = useState([]);
@@ -185,12 +190,15 @@ const HotelOffers = () => {
   const [noMatches, setNoMatches] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // offers (ONLY these 6 CSVs + permanent)
-  const [amazonFreshOffers, setAmazonFreshOffers] = useState([]);
-  const [bigbasketOffers, setBigbasketOffers] = useState([]);
-  const [blinkitOffers, setBlinkitOffers] = useState([]);
-  const [swiggyInstamartOffers, setSwiggyInstamartOffers] = useState([]);
-  const [zeptoOffers, setZeptoOffers] = useState([]);
+  // offers
+  const [easeOffers, setEaseOffers] = useState([]);
+  const [yatraDomesticOffers, setYatraDomesticOffers] = useState([]);
+  const [yatraInternationalOffers, setYatraInternationalOffers] = useState([]);
+  const [ixigoOffers, setIxigoOffers] = useState([]);
+  const [airlineOffers, setAirlineOffers] = useState([]);
+  const [makeMyTripOffers, setMakeMyTripOffers] = useState([]);
+  const [clearTripOffers, setClearTripOffers] = useState([]);
+  const [goibiboOffers, setGoibiboOffers] = useState([]);
   const [permanentOffers, setPermanentOffers] = useState([]);
 
   // responsive
@@ -257,17 +265,20 @@ const HotelOffers = () => {
     loadAllCards();
   }, []);
 
-  // 2) Load ONLY the requested 6 offer CSVs (+ permanent)
+  // 2) Load all offer CSVs
   useEffect(() => {
     async function loadOffers() {
       try {
         const files = [
-          { name: "amazon_fresh.csv", setter: setAmazonFreshOffers },
-          { name: "bigbasket.csv", setter: setBigbasketOffers },
-          { name: "blinkit.csv", setter: setBlinkitOffers },
-          { name: "swiggy_instamart.csv", setter: setSwiggyInstamartOffers },
-          { name: "zepto.csv", setter: setZeptoOffers },
-          { name: "permanent_offers.csv", setter: setPermanentOffers },
+          { name: "easeMyTrip.csv", setter: setEaseOffers },
+          { name: "yatraDomestic.csv", setter: setYatraDomesticOffers },
+          { name: "yatraInternational.csv", setter: setYatraInternationalOffers },
+          { name: "ixigo.csv", setter: setIxigoOffers },
+          { name: "airline.csv", setter: setAirlineOffers },
+          { name: "makemytrip.csv", setter: setMakeMyTripOffers },
+          { name: "cleartrip.csv", setter: setClearTripOffers },
+          { name: "goibibo.csv", setter: setGoibiboOffers },
+          { name: "permanent.csv", setter: setPermanentOffers },
         ];
 
         await Promise.all(
@@ -283,6 +294,63 @@ const HotelOffers = () => {
     }
     loadOffers();
   }, []);
+
+  /** Build chip strips from OFFER CSVs (exclude allCards.csv) */
+  useEffect(() => {
+    const ccMap = new Map(); // baseNorm -> display
+    const dcMap = new Map();
+
+    const harvestList = (val, targetMap) => {
+      for (const raw of splitList(val)) {
+        const base = brandCanonicalize(getBase(raw));
+        const baseNorm = toNorm(base);
+        if (baseNorm) targetMap.set(baseNorm, targetMap.get(baseNorm) || base);
+      }
+    };
+
+    const harvestRows = (rows) => {
+      for (const o of rows || []) {
+        const ccField = firstField(o, LIST_FIELDS.credit);
+        if (ccField) harvestList(ccField, ccMap);
+
+        const dcField = firstField(o, LIST_FIELDS.debit);
+        if (dcField) harvestList(dcField, dcMap);
+      }
+    };
+
+    // Provider files
+    harvestRows(easeOffers);
+    harvestRows(yatraDomesticOffers);
+    harvestRows(yatraInternationalOffers);
+    harvestRows(ixigoOffers);
+    harvestRows(airlineOffers);
+    harvestRows(makeMyTripOffers);
+    harvestRows(clearTripOffers);
+    harvestRows(goibiboOffers);
+
+    // Permanent credit cards (credit only)
+    for (const o of permanentOffers || []) {
+      const nm = firstField(o, LIST_FIELDS.permanentCCName);
+      if (nm) {
+        const base = brandCanonicalize(getBase(nm));
+        const baseNorm = toNorm(base);
+        if (baseNorm) ccMap.set(baseNorm, ccMap.get(baseNorm) || base);
+      }
+    }
+
+    setChipCC(Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b)));
+    setChipDC(Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b)));
+  }, [
+    easeOffers,
+    yatraDomesticOffers,
+    yatraInternationalOffers,
+    ixigoOffers,
+    airlineOffers,
+    makeMyTripOffers,
+    clearTripOffers,
+    goibiboOffers,
+    permanentOffers,
+  ]);
 
   /** search box */
   const onChangeQuery = (e) => {
@@ -335,6 +403,16 @@ const HotelOffers = () => {
     setNoMatches(false);
   };
 
+  // Chip click → set the dropdown + selected entry
+  const handleChipClick = (name, type) => {
+    const display = brandCanonicalize(getBase(name));
+    const baseNorm = toNorm(display);
+    setQuery(display);
+    setSelected({ type, display, baseNorm });
+    setFilteredCards([]);
+    setNoMatches(false);
+  };
+
   /** Build matches for one CSV: return wrappers {offer, site, variantText} */
   function matchesFor(offers, type, site) {
     if (!selected) return [];
@@ -343,7 +421,7 @@ const HotelOffers = () => {
       let list = [];
       if (type === "permanent") {
         const nm = firstField(o, LIST_FIELDS.permanentCCName);
-        if (nm) list = [nm]; // single card name
+        if (nm) list = [nm];
       } else if (type === "debit") {
         list = splitList(firstField(o, LIST_FIELDS.debit));
       } else {
@@ -368,167 +446,78 @@ const HotelOffers = () => {
     return out;
   }
 
-  // Collect then global-dedup (Permanent first, and only for credit)
+  // Collect then global-dedup by priority
   const wPermanent = matchesFor(permanentOffers, "permanent", "Permanent");
-  const wAmazonFresh = matchesFor(amazonFreshOffers, selected?.type === "debit" ? "debit" : "credit", "Amazon Fresh");
-  const wBigbasket = matchesFor(bigbasketOffers, selected?.type === "debit" ? "debit" : "credit", "Bigbasket");
-  const wBlinkit = matchesFor(blinkitOffers, selected?.type === "debit" ? "debit" : "credit", "Blinkit");
-  const wSwiggy = matchesFor(swiggyInstamartOffers, selected?.type === "debit" ? "debit" : "credit", "Swiggy Instamart");
-  const wZepto = matchesFor(zeptoOffers, selected?.type === "debit" ? "debit" : "credit", "Zepto");
+  const wAirline = matchesFor(airlineOffers, selected?.type === "debit" ? "debit" : "credit", "Airline");
+  const wGoibibo = matchesFor(goibiboOffers, selected?.type === "debit" ? "debit" : "credit", "Goibibo");
+  const wEase = matchesFor(easeOffers, selected?.type === "debit" ? "debit" : "credit", "EaseMyTrip");
+  const wYDom = matchesFor(yatraDomesticOffers, selected?.type === "debit" ? "debit" : "credit", "Yatra (Domestic)");
+  const wYInt = matchesFor(yatraInternationalOffers, selected?.type === "debit" ? "debit" : "credit", "Yatra (International)");
+  const wIxigo = matchesFor(ixigoOffers, selected?.type === "debit" ? "debit" : "credit", "Ixigo");
+  const wMMT = matchesFor(makeMyTripOffers, selected?.type === "debit" ? "debit" : "credit", "MakeMyTrip");
+  const wCT = matchesFor(clearTripOffers, selected?.type === "debit" ? "debit" : "credit", "ClearTrip");
 
   const seen = new Set();
-  const dPermanent = selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : [];
-  const dAmazonFresh = dedupWrappers(wAmazonFresh, seen);
-  const dBigbasket = dedupWrappers(wBigbasket, seen);
-  const dBlinkit = dedupWrappers(wBlinkit, seen);
-  const dSwiggy = dedupWrappers(wSwiggy, seen);
-  const dZepto = dedupWrappers(wZepto, seen);
+  const dPermanent = selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : []; // permanent for credit only
+  const dAirline = dedupWrappers(wAirline, seen);
+  const dGoibibo = dedupWrappers(wGoibibo, seen);
+  const dEase = dedupWrappers(wEase, seen);
+  const dYDom = dedupWrappers(wYDom, seen);
+  const dYInt = dedupWrappers(wYInt, seen);
+  const dIxigo = dedupWrappers(wIxigo, seen);
+  const dMMT = dedupWrappers(wMMT, seen);
+  const dCT = dedupWrappers(wCT, seen);
 
   const hasAny = Boolean(
     dPermanent.length ||
-    dAmazonFresh.length ||
-    dBigbasket.length ||
-    dBlinkit.length ||
-    dSwiggy.length ||
-    dZepto.length
+      dAirline.length ||
+      dGoibibo.length ||
+      dEase.length ||
+      dYDom.length ||
+      dYInt.length ||
+      dIxigo.length ||
+      dMMT.length ||
+      dCT.length
   );
 
-  /** -------- Site-specific rendering rules (kept inside OfferCard) -------- */
-  const OfferCard = ({ wrapper, isPermanent = false }) => {
+  /** Offer card UI */
+  const OfferCard = ({ wrapper, isPermanent }) => {
     const o = wrapper.offer;
-
-    // Common pulls
     const title = firstField(o, LIST_FIELDS.title) || o.Website || "Offer";
     const image = firstField(o, LIST_FIELDS.image);
     const desc = firstField(o, LIST_FIELDS.desc);
     const link = firstField(o, LIST_FIELDS.link);
-    const coupon = firstField(o, LIST_FIELDS.coupon);
 
     const showVariantNote =
-      VARIANT_NOTE_SITES.has(wrapper.site) && wrapper.variantText && wrapper.variantText.trim().length > 0;
+      VARIANT_NOTE_SITES.has(wrapper.site) &&
+      wrapper.variantText &&
+      wrapper.variantText.trim().length > 0;
 
     const permanentBenefit = isPermanent ? firstField(o, LIST_FIELDS.permanentBenefit) : "";
 
-    // Copy helper for coupon
-    const [copied, setCopied] = useState(false);
-    const onCopy = async (text) => {
-      try {
-        await navigator.clipboard.writeText(String(text || ""));
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      } catch {
-        // noop
-      }
-    };
-
-    // Site-mode switch
-    const site = wrapper.site;
-
-    // PERMANENT: show image + Grocery Benefits (as you asked)
-    if (isPermanent) {
-      return (
-        <div className="offer-card">
-          {image && <img src={image} alt={title} />}
-          <div className="offer-info">
-            {permanentBenefit && <p className="offer-desc">{permanentBenefit}</p>}
-            <p className="inbuilt-note"><strong>This is a inbuilt feature of this credit card</strong></p>
-            {showVariantNote && (
-              <p className="network-note">
-                <strong>Note:</strong> This benefit is applicable only on <em>{wrapper.variantText}</em> variant
-              </p>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    // AMAZON FRESH / ZEPTO: Title + Description + Link button
-    if (site === "Amazon Fresh" || site === "Zepto") {
-      return (
-        <div className="offer-card">
-          {/* Only show image if already present; requirement didn't forbid it, but link is mandatory */}
-          {image && <img src={image} alt={title} />}
-          <div className="offer-info">
-            <h3 className="offer-title">{title}</h3>
-            {desc && <p className="offer-desc">{desc}</p>}
-            {showVariantNote && (
-              <p className="network-note">
-                <strong>Note:</strong> This benefit is applicable only on <em>{wrapper.variantText}</em> variant
-              </p>
-            )}
-            {link && (
-              <button className="btn" onClick={() => window.open(link, "_blank")}>
-                View Offer
-              </button>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    // BIGBASKET: Title + Description (NO link button)
-    if (site === "Bigbasket") {
-      return (
-        <div className="offer-card">
-          {/* Not required to show image; keeping consistent with your earlier card style */}
-          {image && <img src={image} alt={title} />}
-          <div className="offer-info">
-            <h3 className="offer-title">{title}</h3>
-            {desc && <p className="offer-desc">{desc}</p>}
-            {showVariantNote && (
-              <p className="network-note">
-                <strong>Note:</strong> This benefit is applicable only on <em>{wrapper.variantText}</em> variant
-              </p>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    // BLINKIT / SWIGGY INSTAMART: Coupon Code (with copy) + Description
-    if (site === "Blinkit" || site === "Swiggy Instamart") {
-      return (
-        <div className="offer-card">
-          <div className="offer-info">
-            <h3 className="offer-title">
-              {site} Coupon
-            </h3>
-           {coupon && (
-  <div className="coupon-row">
-    <code className="coupon-code">{coupon}</code>
-    <button
-      className="btn"
-      onClick={() => onCopy(coupon)}
-      title="Copy code"
-      style={{ padding: "6px 10px" }}
-    >
-      {copied ? "✓ Copied" : "📋 Copy"}
-    </button>
-  </div>
-)}
-            {desc && <p className="offer-desc">{desc}</p>}
-            {showVariantNote && (
-              <p className="network-note">
-                <strong>Note:</strong> This benefit is applicable only on <em>{wrapper.variantText}</em> variant
-              </p>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    // Fallback (shouldn't hit for our 6 sites, but keeps previous behavior intact)
     return (
       <div className="offer-card">
         {image && <img src={image} alt={title} />}
         <div className="offer-info">
           <h3 className="offer-title">{title}</h3>
-          {desc && <p className="offer-desc">{desc}</p>}
+
+          {isPermanent ? (
+            <>
+              {permanentBenefit && <p className="offer-desc">{permanentBenefit}</p>}
+              <p className="inbuilt-note">
+                <strong>This is a inbuilt feature of this credit card</strong>
+              </p>
+            </>
+          ) : (
+            desc && <p className="offer-desc">{desc}</p>
+          )}
+
           {showVariantNote && (
             <p className="network-note">
               <strong>Note:</strong> This benefit is applicable only on <em>{wrapper.variantText}</em> variant
             </p>
           )}
+
           {link && (
             <button className="btn" onClick={() => window.open(link, "_blank")}>
               View Offer
@@ -541,6 +530,103 @@ const HotelOffers = () => {
 
   return (
     <div className="App" style={{ fontFamily: "'Libre Baskerville', serif" }}>
+      {/* 🔹 Cards-with-offers strip container — same CSS vibe as your HotelOffers block */}
+      {(chipCC.length > 0 || chipDC.length > 0) && (
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "14px auto 0",
+            padding: "14px 16px",
+            background: "#F7F9FC",
+            border: "1px solid #E8EDF3",
+            borderRadius: 10,
+            boxShadow: "0 6px 18px rgba(15,23,42,.06)",
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 16,
+              color: "#1F2D45",
+              marginBottom: 10,
+              display: "flex",
+              justifyContent: "center",
+              gap: 8,
+            }}
+          >
+            <span>Credit And Debit Cards Which Have Offers</span>
+          </div>
+
+          {/* Credit strip */}
+          {chipCC.length > 0 && (
+            <marquee direction="left" scrollAmount="4" style={{ marginBottom: 8, whiteSpace: "nowrap" }}>
+              <strong style={{ marginRight: 10, color: "#1F2D45" }}>Credit Cards:</strong>
+              {chipCC.map((name, idx) => (
+                <span
+                  key={`cc-chip-${idx}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleChipClick(name, "credit")}
+                  onKeyDown={(e) => (e.key === "Enter" ? handleChipClick(name, "credit") : null)}
+                  style={{
+                    display: "inline-block",
+                    padding: "6px 10px",
+                    border: "1px solid #E0E6EE",
+                    borderRadius: 9999,
+                    marginRight: 8,
+                    background: "#fff",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    lineHeight: 1.2,
+                    userSelect: "none",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = "#F0F5FF")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "#fff")}
+                  title="Click to select this card"
+                >
+                  {name}
+                </span>
+              ))}
+            </marquee>
+          )}
+
+          {/* Debit strip */}
+          {chipDC.length > 0 && (
+            <marquee direction="left" scrollAmount="4" style={{ whiteSpace: "nowrap" }}>
+              <strong style={{ marginRight: 10, color: "#1F2D45" }}>Debit Cards:</strong>
+              {chipDC.map((name, idx) => (
+                <span
+                  key={`dc-chip-${idx}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleChipClick(name, "debit")}
+                  onKeyDown={(e) => (e.key === "Enter" ? handleChipClick(name, "debit") : null)}
+                  style={{
+                    display: "inline-block",
+                    padding: "6px 10px",
+                    border: "1px solid #E0E6EE",
+                    borderRadius: 9999,
+                    marginRight: 8,
+                    background: "#fff",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    lineHeight: 1.2,
+                    userSelect: "none",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = "#F0F5FF")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "#fff")}
+                  title="Click to select this card"
+                >
+                  {name}
+                </span>
+              ))}
+            </marquee>
+          )}
+        </div>
+      )}
+
       {/* Search / dropdown */}
       <div className="dropdown" style={{ position: "relative", width: "600px", margin: "20px auto" }}>
         <input
@@ -619,56 +705,89 @@ const HotelOffers = () => {
             </div>
           )}
 
-          {!!dAmazonFresh.length && (
+          {!!dAirline.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Amazon Fresh</h2>
+              <h2 style={{ textAlign: "center" }}>Airline Offers</h2>
               <div className="offer-grid">
-                {dAmazonFresh.map((w, i) => (
-                  <OfferCard key={`af-${i}`} wrapper={w} />
+                {dAirline.map((w, i) => (
+                  <OfferCard key={`air-${i}`} wrapper={w} />
                 ))}
               </div>
             </div>
           )}
 
-          {!!dBigbasket.length && (
+          {!!dGoibibo.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Bigbasket</h2>
+              <h2 style={{ textAlign: "center" }}>Offers on Goibibo</h2>
               <div className="offer-grid">
-                {dBigbasket.map((w, i) => (
-                  <OfferCard key={`bb-${i}`} wrapper={w} />
+                {dGoibibo.map((w, i) => (
+                  <OfferCard key={`go-${i}`} wrapper={w} />
                 ))}
               </div>
             </div>
           )}
 
-          {!!dBlinkit.length && (
+          {!!dEase.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Blinkit</h2>
+              <h2 style={{ textAlign: "center" }}>Offers on EaseMyTrip</h2>
               <div className="offer-grid">
-                {dBlinkit.map((w, i) => (
-                  <OfferCard key={`bl-${i}`} wrapper={w} />
+                {dEase.map((w, i) => (
+                  <OfferCard key={`emt-${i}`} wrapper={w} />
                 ))}
               </div>
             </div>
           )}
 
-          {!!dSwiggy.length && (
+          {!!dYDom.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Swiggy Instamart</h2>
+              <h2 style={{ textAlign: "center" }}>Offers on Yatra (Domestic)</h2>
               <div className="offer-grid">
-                {dSwiggy.map((w, i) => (
-                  <OfferCard key={`sw-${i}`} wrapper={w} />
+                {dYDom.map((w, i) => (
+                  <OfferCard key={`yd-${i}`} wrapper={w} />
                 ))}
               </div>
             </div>
           )}
 
-          {!!dZepto.length && (
+          {!!dYInt.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers on Zepto</h2>
+              <h2 style={{ textAlign: "center" }}>Offers on Yatra (International)</h2>
               <div className="offer-grid">
-                {dZepto.map((w, i) => (
-                  <OfferCard key={`zp-${i}`} wrapper={w} />
+                {dYInt.map((w, i) => (
+                  <OfferCard key={`yi-${i}`} wrapper={w} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!!dIxigo.length && (
+            <div className="offer-group">
+              <h2 style={{ textAlign: "center" }}>Offers on Ixigo</h2>
+              <div className="offer-grid">
+                {dIxigo.map((w, i) => (
+                  <OfferCard key={`ix-${i}`} wrapper={w} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!!dMMT.length && (
+            <div className="offer-group">
+              <h2 style={{ textAlign: "center" }}>Offers on MakeMyTrip</h2>
+              <div className="offer-grid">
+                {dMMT.map((w, i) => (
+                  <OfferCard key={`mmt-${i}`} wrapper={w} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!!dCT.length && (
+            <div className="offer-group">
+              <h2 style={{ textAlign: "center" }}>Offers on ClearTrip</h2>
+              <div className="offer-grid">
+                {dCT.map((w, i) => (
+                  <OfferCard key={`ct-${i}`} wrapper={w} />
                 ))}
               </div>
             </div>
@@ -714,4 +833,4 @@ const HotelOffers = () => {
   );
 };
 
-export default HotelOffers;
+export default AirlineOffers;
