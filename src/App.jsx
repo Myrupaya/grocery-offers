@@ -13,7 +13,12 @@ const LIST_FIELDS = {
   desc: ["Description", "Details", "Offer Description", "Flight Benefit"],
   // Permanent (inbuilt) CSV fields
   permanentCCName: ["Eligible Credit Cards"],
-  permanentBenefit: ["Grocery Benefits", "Benefit", "Offer", "Hotel Benefit"],
+  permanentBenefit: [
+    "Grocery Benefits",
+    "Benefit",
+    "Offer",
+    "Hotel Benefit",
+  ],
 };
 
 const MAX_SUGGESTIONS = 50;
@@ -29,11 +34,23 @@ const VARIANT_NOTE_SITES = new Set([
   "Goibibo",
   "Airline",
   "Permanent",
-  // 🔹 Added for your new CSVs:
+  // grocery-specific:
   "Amazon Fresh",
   "BigBasket",
   "Blinkit",
 ]);
+
+/** -------------------- FALLBACK LOGOS -------------------- */
+/* If the CSV has no valid image OR the image fails to load,
+   we'll replace it with this per-site logo. */
+const FALLBACK_IMAGE_BY_SITE = {
+  "amazon fresh":
+    "https://media.assettype.com/digitalterminal/import/uploads/news/1653396756s_Amazon-Fresh.jpg?w=1200&h=675&auto=format%2Ccompress&fit=max&enlarge=true",
+  bigbasket:
+    "https://res.cloudinary.com/dyyjph6kx/image/upload/gift_vouchers/phpQXkLhM_y1zyz5.jpg",
+  blinkit:
+    "https://yt3.googleusercontent.com/oe7za_pjcm3tYZKtTAs6aWuZCOzB6aHWnZOGYwrYjuZe72SMkVs3qoCElDQl-ob8CaKNimXI=s900-c-k-c0x00ffffff-no-rj",
+};
 
 /** -------------------- HELPERS -------------------- */
 const toNorm = (s) =>
@@ -109,7 +126,11 @@ function lev(a, b) {
   for (let i = 1; i <= n; i++) {
     for (let j = 1; j <= m; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      d[i][j] = Math.min(
+        d[i - 1][j] + 1,
+        d[i][j - 1] + 1,
+        d[i - 1][j - 1] + cost
+      );
     }
   }
   return d[n][m];
@@ -124,8 +145,11 @@ function scoreCandidate(q, cand) {
   const qWords = qs.split(" ").filter(Boolean);
   const cWords = cs.split(" ").filter(Boolean);
 
-  const matchingWords = qWords.filter((qw) => cWords.some((cw) => cw.includes(qw))).length;
+  const matchingWords = qWords.filter((qw) =>
+    cWords.some((cw) => cw.includes(qw))
+  ).length;
   const sim = 1 - lev(qs, cs) / Math.max(qs.length, cs.length);
+
   return (matchingWords / Math.max(1, qWords.length)) * 0.7 + sim * 0.3;
 }
 
@@ -147,7 +171,9 @@ function normalizeText(s) {
 }
 function offerKey(offer) {
   const image = normalizeUrl(firstField(offer, LIST_FIELDS.image) || "");
-  const title = normalizeText(firstField(offer, LIST_FIELDS.title) || offer.Website || "");
+  const title = normalizeText(
+    firstField(offer, LIST_FIELDS.title) || offer.Website || ""
+  );
   const desc = normalizeText(firstField(offer, LIST_FIELDS.desc) || "");
   const link = normalizeUrl(firstField(offer, LIST_FIELDS.link) || "");
   return `${title}||${desc}||${image}||${link}`;
@@ -164,15 +190,51 @@ function dedupWrappers(arr, seen) {
   return out;
 }
 
+/** Decide if an image from CSV is usable (not blank / N/A / etc.) */
+function isUsableImage(val) {
+  if (!val) return false;
+  const s = String(val).trim();
+  if (!s) return false;
+  if (/^(na|n\/a|null|undefined|-|image unavailable)$/i.test(s)) return false;
+  return true;
+}
+
+/** Choose final image src + whether it's fallback */
+function resolveImage(site, candidate) {
+  const key = String(site || "").toLowerCase();
+  const fallback = FALLBACK_IMAGE_BY_SITE[key];
+  const shouldFallback = !isUsableImage(candidate) && !!fallback;
+  return {
+    src: shouldFallback ? fallback : candidate,
+    usingFallback: shouldFallback,
+  };
+}
+
+/** onError -> switch to fallback (if not already) */
+function handleImgError(e, site) {
+  const key = String(site || "").toLowerCase();
+  const fallback = FALLBACK_IMAGE_BY_SITE[key];
+  const el = e.currentTarget;
+  if (fallback && el.src !== fallback) {
+    el.src = fallback;
+    el.classList.add("is-fallback");
+  } else {
+    // nothing works, hide it
+    el.style.display = "none";
+  }
+}
+
 /** Disclaimer */
 const Disclaimer = () => (
   <section className="disclaimer">
     <h3>Disclaimer</h3>
     <p>
-      All offers, coupons, and discounts listed on our platform are provided for informational purposes only.
-      We do not guarantee the accuracy, availability, or validity of any offer. Users are advised to verify the
-      terms and conditions with the respective merchants before making any purchase. We are not responsible for any
-      discrepancies, expired offers, or losses arising from the use of these coupons.
+      All offers, coupons, and discounts listed on our platform are provided
+      for informational purposes only. We do not guarantee the accuracy,
+      availability, or validity of any offer. Users are advised to verify the
+      terms and conditions with the respective merchants before making any
+      purchase. We are not responsible for any discrepancies, expired offers,
+      or losses arising from the use of these coupons.
     </p>
   </section>
 );
@@ -183,7 +245,7 @@ const AirlineOffers = () => {
   const [creditEntries, setCreditEntries] = useState([]);
   const [debitEntries, setDebitEntries] = useState([]);
 
-  // 🔹 chip strips (from offer CSVs ONLY — NOT allCards.csv)
+  // chip strips (from offer CSVs ONLY — NOT allCards.csv)
   const [chipCC, setChipCC] = useState([]); // credit bases
   const [chipDC, setChipDC] = useState([]); // debit bases
 
@@ -224,13 +286,15 @@ const AirlineOffers = () => {
           for (const raw of ccList) {
             const base = brandCanonicalize(getBase(raw));
             const baseNorm = toNorm(base);
-            if (baseNorm) creditMap.set(baseNorm, creditMap.get(baseNorm) || base);
+            if (baseNorm)
+              creditMap.set(baseNorm, creditMap.get(baseNorm) || base);
           }
           const dcList = splitList(firstField(row, LIST_FIELDS.debit));
           for (const raw of dcList) {
             const base = brandCanonicalize(getBase(raw));
             const baseNorm = toNorm(base);
-            if (baseNorm) debitMap.set(baseNorm, debitMap.get(baseNorm) || base);
+            if (baseNorm)
+              debitMap.set(baseNorm, debitMap.get(baseNorm) || base);
           }
         }
 
@@ -245,9 +309,13 @@ const AirlineOffers = () => {
         setDebitEntries(debit);
 
         setFilteredCards([
-          ...(credit.length ? [{ type: "heading", label: "Credit Cards" }] : []),
+          ...(credit.length
+            ? [{ type: "heading", label: "Credit Cards" }]
+            : []),
           ...credit,
-          ...(debit.length ? [{ type: "heading", label: "Debit Cards" }] : []),
+          ...(debit.length
+            ? [{ type: "heading", label: "Debit Cards" }]
+            : []),
           ...debit,
         ]);
 
@@ -278,7 +346,10 @@ const AirlineOffers = () => {
         await Promise.all(
           files.map(async (f) => {
             const res = await axios.get(`/${encodeURIComponent(f.name)}`);
-            const parsed = Papa.parse(res.data, { header: true });
+            const parsed = Papa.parse(res.data, {
+              header: true,
+              skipEmptyLines: true,
+            });
             f.setter(parsed.data || []);
           })
         );
@@ -298,7 +369,8 @@ const AirlineOffers = () => {
       for (const raw of splitList(val)) {
         const base = brandCanonicalize(getBase(raw));
         const baseNorm = toNorm(base);
-        if (baseNorm) targetMap.set(baseNorm, targetMap.get(baseNorm) || base);
+        if (baseNorm)
+          targetMap.set(baseNorm, targetMap.get(baseNorm) || base);
       }
     };
 
@@ -312,7 +384,7 @@ const AirlineOffers = () => {
       }
     };
 
-    // 🔹 Retail files
+    // grocery offer files
     harvestRows(amazonOffers);
     harvestRows(bigBasketOffers);
     harvestRows(blinkitOffers);
@@ -323,12 +395,17 @@ const AirlineOffers = () => {
       if (nm) {
         const base = brandCanonicalize(getBase(nm));
         const baseNorm = toNorm(base);
-        if (baseNorm) ccMap.set(baseNorm, ccMap.get(baseNorm) || base);
+        if (baseNorm)
+          ccMap.set(baseNorm, ccMap.get(baseNorm) || base);
       }
     }
 
-    setChipCC(Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b)));
-    setChipDC(Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b)));
+    setChipCC(
+      Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b))
+    );
+    setChipDC(
+      Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b))
+    );
   }, [amazonOffers, bigBasketOffers, blinkitOffers, permanentOffers]);
 
   /** search box */
@@ -352,7 +429,10 @@ const AirlineOffers = () => {
           return { it, s, inc };
         })
         .filter(({ s, inc }) => inc || s > 0.3)
-        .sort((a, b) => (b.s - a.s) || a.it.display.localeCompare(b.it.display))
+        .sort(
+          (a, b) =>
+            b.s - a.s || a.it.display.localeCompare(b.it.display)
+        )
         .slice(0, MAX_SUGGESTIONS)
         .map(({ it }) => it);
 
@@ -425,14 +505,32 @@ const AirlineOffers = () => {
     return out;
   }
 
-  // Collect then global-dedup by priority
-  const wPermanent = matchesFor(permanentOffers, "permanent", "Permanent");
-  const wAmazon = matchesFor(amazonOffers, selected?.type === "debit" ? "debit" : "credit", "Amazon Fresh");
-  const wBigBasket = matchesFor(bigBasketOffers, selected?.type === "debit" ? "debit" : "credit", "BigBasket");
-  const wBlinkit = matchesFor(blinkitOffers, selected?.type === "debit" ? "debit" : "credit", "Blinkit");
+  // Collect matches, then dedup
+  const wPermanent = matchesFor(
+    permanentOffers,
+    "permanent",
+    "Permanent"
+  );
+  const wAmazon = matchesFor(
+    amazonOffers,
+    selected?.type === "debit" ? "debit" : "credit",
+    "Amazon Fresh"
+  );
+  const wBigBasket = matchesFor(
+    bigBasketOffers,
+    selected?.type === "debit" ? "debit" : "credit",
+    "BigBasket"
+  );
+  const wBlinkit = matchesFor(
+    blinkitOffers,
+    selected?.type === "debit" ? "debit" : "credit",
+    "Blinkit"
+  );
 
   const seen = new Set();
-  const dPermanent = selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : []; // permanent for credit only (same as before)
+  // permanent for credit only
+  const dPermanent =
+    selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : [];
   const dAmazon = dedupWrappers(wAmazon, seen);
   const dBigBasket = dedupWrappers(wBigBasket, seen);
   const dBlinkit = dedupWrappers(wBlinkit, seen);
@@ -444,63 +542,77 @@ const AirlineOffers = () => {
   /** Offer card UI */
   const OfferCard = ({ wrapper, isPermanent, isRetail }) => {
     const o = wrapper.offer;
+    const siteName = wrapper.site; // "Amazon Fresh", "BigBasket", "Blinkit", "Permanent"
 
-    // For retail CSVs: Offer -> Description -> Eligible
-    let title, desc, eligible;
-    if (isRetail) {
-      title = o["Offer"] || "Offer";
-      desc = o["Description"] || "";
-      const ec = o["Eligible Credit Cards"] || "";
-      const ed = o["Eligible Debit Cards"] || "";
-      const elig = [ec, ed].filter(Boolean).join("  ");
-      eligible = elig.trim();
-    } else {
-      title = firstField(o, LIST_FIELDS.title) || o.Website || "Offer";
-      desc = firstField(o, LIST_FIELDS.desc);
-    }
+    // pull fields
+    const titleFromCsv =
+      firstField(o, LIST_FIELDS.title) || o.Website || o["Offer"];
+    const descFromCsv =
+      firstField(o, LIST_FIELDS.desc) || o["Description"] || "";
 
-    const image = firstField(o, LIST_FIELDS.image);
+    const permanentBenefit = isPermanent
+      ? firstField(o, LIST_FIELDS.permanentBenefit)
+      : "";
+
     const link = firstField(o, LIST_FIELDS.link);
 
+    // image (with fallback per-site)
+    const rawImage = firstField(o, LIST_FIELDS.image);
+    const { src: finalImg, usingFallback } = resolveImage(
+      siteName,
+      rawImage
+    );
+
     const showVariantNote =
-      VARIANT_NOTE_SITES.has(wrapper.site) &&
+      VARIANT_NOTE_SITES.has(siteName) &&
       wrapper.variantText &&
       wrapper.variantText.trim().length > 0;
 
-    const permanentBenefit = isPermanent ? firstField(o, LIST_FIELDS.permanentBenefit) : "";
-
     return (
       <div className="offer-card">
-        {image && <img src={image} alt={title} />}
+        {finalImg && (
+          <img
+            className={`offer-img ${usingFallback ? "is-fallback" : ""}`}
+            src={finalImg}
+            alt={titleFromCsv || "Offer"}
+            onError={(e) => handleImgError(e, siteName)}
+          />
+        )}
+
         <div className="offer-info">
-          <h3 className="offer-title">{title}</h3>
+          <h3 className="offer-title">
+            {titleFromCsv || "Offer"}
+          </h3>
 
           {isPermanent ? (
             <>
-              {permanentBenefit && <p className="offer-desc">{permanentBenefit}</p>}
+              {permanentBenefit && (
+                <p className="offer-desc">{permanentBenefit}</p>
+              )}
               <p className="inbuilt-note">
-                <strong>This is a inbuilt feature of this credit card</strong>
+                <strong>
+                  This is a inbuilt feature of this credit card
+                </strong>
               </p>
             </>
           ) : (
-            desc && <p className="offer-desc">{desc}</p>
+            descFromCsv && (
+              <p className="offer-desc">{descFromCsv}</p>
+            )
           )}
-
-          {/* Retail eligible line (after description)
-          {isRetail && eligible && (
-            <p className="offer-desc">
-              <strong>Eligible:</strong> {eligible}
-            </p>
-          )} */}
 
           {showVariantNote && (
             <p className="network-note">
-              <strong>Note:</strong> This benefit is applicable only on <em>{wrapper.variantText}</em> variant
+              <strong>Note:</strong> This benefit is applicable only
+              on <em>{wrapper.variantText}</em> variant
             </p>
           )}
 
           {link && (
-            <button className="btn" onClick={() => window.open(link, "_blank")}>
+            <button
+              className="btn"
+              onClick={() => window.open(link, "_blank")}
+            >
               View Offer
             </button>
           )}
@@ -510,8 +622,11 @@ const AirlineOffers = () => {
   };
 
   return (
-    <div className="App" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-      {/* 🔹 Cards-with-offers strip container — same CSS vibe as your HotelOffers block */}
+    <div
+      className="App"
+      style={{ fontFamily: "'Libre Baskerville', serif" }}
+    >
+      {/* Cards-with-offers strip container */}
       {(chipCC.length > 0 || chipDC.length > 0) && (
         <div
           style={{
@@ -540,15 +655,30 @@ const AirlineOffers = () => {
 
           {/* Credit strip */}
           {chipCC.length > 0 && (
-            <marquee direction="left" scrollAmount="4" style={{ marginBottom: 8, whiteSpace: "nowrap" }}>
-              <strong style={{ marginRight: 10, color: "#1F2D45" }}>Credit Cards:</strong>
+            <marquee
+              direction="left"
+              scrollAmount="4"
+              style={{
+                marginBottom: 8,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <strong
+                style={{ marginRight: 10, color: "#1F2D45" }}
+              >
+                Credit Cards:
+              </strong>
               {chipCC.map((name, idx) => (
                 <span
                   key={`cc-chip-${idx}`}
                   role="button"
                   tabIndex={0}
                   onClick={() => handleChipClick(name, "credit")}
-                  onKeyDown={(e) => (e.key === "Enter" ? handleChipClick(name, "credit") : null)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter"
+                      ? handleChipClick(name, "credit")
+                      : null
+                  }
                   style={{
                     display: "inline-block",
                     padding: "6px 10px",
@@ -556,14 +686,20 @@ const AirlineOffers = () => {
                     borderRadius: 9999,
                     marginRight: 8,
                     background: "#fff",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.05)",
                     cursor: "pointer",
                     fontSize: 14,
                     lineHeight: 1.2,
                     userSelect: "none",
                   }}
-                  onMouseOver={(e) => (e.currentTarget.style.background = "#F0F5FF")}
-                  onMouseOut={(e) => (e.currentTarget.style.background = "#fff")}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.background =
+                      "#F0F5FF")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.background = "#fff")
+                  }
                   title="Click to select this card"
                 >
                   {name}
@@ -574,15 +710,27 @@ const AirlineOffers = () => {
 
           {/* Debit strip */}
           {chipDC.length > 0 && (
-            <marquee direction="left" scrollAmount="4" style={{ whiteSpace: "nowrap" }}>
-              <strong style={{ marginRight: 10, color: "#1F2D45" }}>Debit Cards:</strong>
+            <marquee
+              direction="left"
+              scrollAmount="4"
+              style={{ whiteSpace: "nowrap" }}
+            >
+              <strong
+                style={{ marginRight: 10, color: "#1F2D45" }}
+              >
+                Debit Cards:
+              </strong>
               {chipDC.map((name, idx) => (
                 <span
                   key={`dc-chip-${idx}`}
                   role="button"
                   tabIndex={0}
                   onClick={() => handleChipClick(name, "debit")}
-                  onKeyDown={(e) => (e.key === "Enter" ? handleChipClick(name, "debit") : null)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter"
+                      ? handleChipClick(name, "debit")
+                      : null
+                  }
                   style={{
                     display: "inline-block",
                     padding: "6px 10px",
@@ -590,14 +738,20 @@ const AirlineOffers = () => {
                     borderRadius: 9999,
                     marginRight: 8,
                     background: "#fff",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.05)",
                     cursor: "pointer",
                     fontSize: 14,
                     lineHeight: 1.2,
                     userSelect: "none",
                   }}
-                  onMouseOver={(e) => (e.currentTarget.style.background = "#F0F5FF")}
-                  onMouseOut={(e) => (e.currentTarget.style.background = "#fff")}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.background =
+                      "#F0F5FF")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.background = "#fff")
+                  }
                   title="Click to select this card"
                 >
                   {name}
@@ -609,7 +763,14 @@ const AirlineOffers = () => {
       )}
 
       {/* Search / dropdown */}
-      <div className="dropdown" style={{ position: "relative", width: "600px", margin: "20px auto" }}>
+      <div
+        className="dropdown"
+        style={{
+          position: "relative",
+          width: "600px",
+          margin: "20px auto",
+        }}
+      >
         <input
           type="text"
           value={query}
@@ -643,7 +804,14 @@ const AirlineOffers = () => {
           >
             {filteredCards.map((item, idx) =>
               item.type === "heading" ? (
-                <li key={`h-${idx}`} style={{ padding: "8px 10px", fontWeight: 700, background: "#fafafa" }}>
+                <li
+                  key={`h-${idx}`}
+                  style={{
+                    padding: "8px 10px",
+                    fontWeight: 700,
+                    background: "#fafafa",
+                  }}
+                >
                   {item.label}
                 </li>
               ) : (
@@ -653,10 +821,17 @@ const AirlineOffers = () => {
                   style={{
                     padding: "10px",
                     cursor: "pointer",
-                    borderBottom: "1px solid #f2f2f2",
+                    borderBottom:
+                      "1px solid #f2f2f2",
                   }}
-                  onMouseOver={(e) => (e.currentTarget.style.background = "#f7f9ff")}
-                  onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.background =
+                      "#f7f9ff")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.background =
+                      "transparent")
+                  }
                 >
                   {item.display}
                 </li>
@@ -667,20 +842,40 @@ const AirlineOffers = () => {
       </div>
 
       {noMatches && query.trim() && (
-        <p style={{ color: "#d32f2f", textAlign: "center", marginTop: 8 }}>
-          No matching cards found. Please try a different name.
+        <p
+          style={{
+            color: "#d32f2f",
+            textAlign: "center",
+            marginTop: 8,
+          }}
+        >
+          No matching cards found. Please try a different
+          name.
         </p>
       )}
 
       {/* Offers by section */}
       {selected && hasAny && !noMatches && (
-        <div className="offers-section" style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
+        <div
+          className="offers-section"
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: 20,
+          }}
+        >
           {!!dPermanent.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Permanent Offers</h2>
+              <h2 style={{ textAlign: "center" }}>
+                Permanent Offers
+              </h2>
               <div className="offer-grid">
                 {dPermanent.map((w, i) => (
-                  <OfferCard key={`perm-${i}`} wrapper={w} isPermanent />
+                  <OfferCard
+                    key={`perm-${i}`}
+                    wrapper={w}
+                    isPermanent
+                  />
                 ))}
               </div>
             </div>
@@ -688,10 +883,16 @@ const AirlineOffers = () => {
 
           {!!dAmazon.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers On Amazon Fresh</h2>
+              <h2 style={{ textAlign: "center" }}>
+                Offers On Amazon Fresh
+              </h2>
               <div className="offer-grid">
                 {dAmazon.map((w, i) => (
-                  <OfferCard key={`amz-${i}`} wrapper={w} isRetail />
+                  <OfferCard
+                    key={`amz-${i}`}
+                    wrapper={w}
+                    isRetail
+                  />
                 ))}
               </div>
             </div>
@@ -699,10 +900,16 @@ const AirlineOffers = () => {
 
           {!!dBigBasket.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers On BigBasket</h2>
+              <h2 style={{ textAlign: "center" }}>
+                Offers On BigBasket
+              </h2>
               <div className="offer-grid">
                 {dBigBasket.map((w, i) => (
-                  <OfferCard key={`bb-${i}`} wrapper={w} isRetail />
+                  <OfferCard
+                    key={`bb-${i}`}
+                    wrapper={w}
+                    isRetail
+                  />
                 ))}
               </div>
             </div>
@@ -710,10 +917,16 @@ const AirlineOffers = () => {
 
           {!!dBlinkit.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>Offers On Blinkit</h2>
+              <h2 style={{ textAlign: "center" }}>
+                Offers On Blinkit
+              </h2>
               <div className="offer-grid">
                 {dBlinkit.map((w, i) => (
-                  <OfferCard key={`bl-${i}`} wrapper={w} isRetail />
+                  <OfferCard
+                    key={`bl-${i}`}
+                    wrapper={w}
+                    isRetail
+                  />
                 ))}
               </div>
             </div>
@@ -722,14 +935,25 @@ const AirlineOffers = () => {
       )}
 
       {selected && !hasAny && !noMatches && (
-        <p style={{ color: "#d32f2f", textAlign: "center", marginTop: 10 }}>
+        <p
+          style={{
+            color: "#d32f2f",
+            textAlign: "center",
+            marginTop: 10,
+          }}
+        >
           No offer available for this card
         </p>
       )}
 
       {selected && hasAny && !noMatches && (
         <button
-          onClick={() => window.scrollBy({ top: window.innerHeight, behavior: "smooth" })}
+          onClick={() =>
+            window.scrollBy({
+              top: window.innerHeight,
+              behavior: "smooth",
+            })
+          }
           style={{
             position: "fixed",
             right: 20,
@@ -742,7 +966,8 @@ const AirlineOffers = () => {
             cursor: "pointer",
             fontSize: 18,
             zIndex: 1000,
-            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+            boxShadow:
+              "0 2px 5px rgba(0,0,0,0.2)",
             width: isMobile ? 50 : 140,
             height: isMobile ? 50 : 50,
             display: "flex",
