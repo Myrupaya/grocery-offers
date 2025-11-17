@@ -13,12 +13,7 @@ const LIST_FIELDS = {
   desc: ["Description", "Details", "Offer Description", "Flight Benefit"],
   // Permanent (inbuilt) CSV fields
   permanentCCName: ["Eligible Credit Cards"],
-  permanentBenefit: [
-    "Grocery Benefits",
-    "Benefit",
-    "Offer",
-    "Hotel Benefit",
-  ],
+  permanentBenefit: ["Grocery Benefits", "Benefit", "Offer", "Hotel Benefit"],
 };
 
 const MAX_SUGGESTIONS = 50;
@@ -148,6 +143,36 @@ function scoreCandidate(q, cand) {
   const sim = 1 - lev(qs, cs) / Math.max(qs.length, cs.length);
 
   return (matchingWords / Math.max(1, qWords.length)) * 0.7 + sim * 0.3;
+}
+
+/** 🔹 Fuzzy name matcher – handles typos like "selct" ≈ "select" */
+function isFuzzyNameMatch(query, label) {
+  const q = toNorm(query);
+  const l = toNorm(label);
+  if (!q || !l) return false;
+
+  // direct substring
+  if (l.includes(q)) return true;
+
+  // whole-string similarity
+  const wholeDist = lev(q, l);
+  const wholeSim = 1 - wholeDist / Math.max(q.length, l.length);
+  if (wholeSim >= 0.6) return true;
+
+  // per-word similarity ("selct" vs "select")
+  const qWords = q.split(" ").filter(Boolean);
+  const lWords = l.split(" ").filter(Boolean);
+
+  for (const qw of qWords) {
+    if (qw.length < 3) continue;
+    for (const lw of lWords) {
+      if (lw.length < 3) continue;
+      const d = lev(qw, lw);
+      const sim = 1 - d / Math.max(qw.length, lw.length);
+      if (sim >= 0.7) return true;
+    }
+  }
+  return false;
 }
 
 /** Dropdown entry builder */
@@ -305,13 +330,9 @@ const AirlineOffers = () => {
         setDebitEntries(debit);
 
         setFilteredCards([
-          ...(credit.length
-            ? [{ type: "heading", label: "Credit Cards" }]
-            : []),
+          ...(credit.length ? [{ type: "heading", label: "Credit Cards" }] : []),
           ...credit,
-          ...(debit.length
-            ? [{ type: "heading", label: "Debit Cards" }]
-            : []),
+          ...(debit.length ? [{ type: "heading", label: "Debit Cards" }] : []),
           ...debit,
         ]);
 
@@ -364,8 +385,7 @@ const AirlineOffers = () => {
       for (const raw of splitList(val)) {
         const base = brandCanonicalize(getBase(raw));
         const baseNorm = toNorm(base);
-        if (baseNorm)
-          targetMap.set(baseNorm, targetMap.get(baseNorm) || base);
+        if (baseNorm) targetMap.set(baseNorm, targetMap.get(baseNorm) || base);
       }
     };
 
@@ -389,64 +409,109 @@ const AirlineOffers = () => {
       if (nm) {
         const base = brandCanonicalize(getBase(nm));
         const baseNorm = toNorm(base);
-        if (baseNorm)
-          ccMap.set(baseNorm, ccMap.get(baseNorm) || base);
+        if (baseNorm) ccMap.set(baseNorm, ccMap.get(baseNorm) || base);
       }
     }
 
-    setChipCC(
-      Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b))
-    );
-    setChipDC(
-      Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b))
-    );
+    setChipCC(Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b)));
+    setChipDC(Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b)));
   }, [blinkitOffers, swiggyOffers, permanentOffers]);
 
-  /** search box */
+  /** search box – UPDATED with fuzzy + select + debit-first logic */
   const onChangeQuery = (e) => {
     const val = e.target.value;
     setQuery(val);
+    setSelected(null);
 
     if (!val.trim()) {
       setFilteredCards([]);
-      setSelected(null);
       setNoMatches(false);
       return;
     }
 
-    const q = val.trim().toLowerCase();
+    const trimmed = val.trim();
+    const qLower = trimmed.toLowerCase();
+
     const scored = (arr) =>
       arr
         .map((it) => {
-          const s = scoreCandidate(val, it.display);
-          const inc = it.display.toLowerCase().includes(q);
-          return { it, s, inc };
+          const baseScore = scoreCandidate(trimmed, it.display);
+          const inc = it.display.toLowerCase().includes(qLower);
+          const fuzzy = isFuzzyNameMatch(trimmed, it.display);
+
+          let s = baseScore;
+          if (inc) s += 2.0; // strong boost if substring match
+          if (fuzzy) s += 1.5; // boost typo-ish matches
+
+          return { it, s, inc, fuzzy };
         })
-        .filter(({ s, inc }) => inc || s > 0.3)
-        .sort(
-          (a, b) =>
-            b.s - a.s || a.it.display.localeCompare(b.it.display)
-        )
+        .filter(({ s, inc, fuzzy }) => inc || fuzzy || s > 0.3)
+        .sort((a, b) => b.s - a.s || a.it.display.localeCompare(b.it.display))
         .slice(0, MAX_SUGGESTIONS)
         .map(({ it }) => it);
 
-    const cc = scored(creditEntries);
-    const dc = scored(debitEntries);
+    let cc = scored(creditEntries);
+    let dc = scored(debitEntries);
 
     if (!cc.length && !dc.length) {
       setNoMatches(true);
-      setSelected(null);
       setFilteredCards([]);
       return;
     }
 
+    // ---- SPECIAL CASE 1: "select" intent (even with typos like "selct") ----
+    const qNorm = toNorm(trimmed);
+    const qWords = qNorm.split(" ").filter(Boolean);
+
+    const hasSelectWord = qWords.some((w) => {
+      if (w === "select") return true;
+      if (w.length < 3) return false;
+      const d = lev(w, "select");
+      const sim = 1 - d / Math.max(w.length, "select".length);
+      return sim >= 0.7; // "selct", "selec", "slect", etc.
+    });
+
+    const isSelectIntent =
+      qNorm.includes("select credit card") ||
+      qNorm.includes("select card") ||
+      hasSelectWord;
+
+    if (isSelectIntent) {
+      const reorderBySelect = (arr) => {
+        const selectCards = [];
+        const others = [];
+        arr.forEach((item) => {
+          const labelNorm = toNorm(item.display);
+          if (labelNorm.includes("select")) selectCards.push(item);
+          else others.push(item);
+        });
+        return [...selectCards, ...others];
+      };
+      cc = reorderBySelect(cc);
+      dc = reorderBySelect(dc);
+    }
+
+    // ---- SPECIAL CASE 2: debit intent => Debit Cards section first ----
+    const lv = qLower;
+    const debitIntent =
+      lv.includes("debit card") || lv.includes("debit") || lv.includes("dc");
+
     setNoMatches(false);
-    setFilteredCards([
-      ...(cc.length ? [{ type: "heading", label: "Credit Cards" }] : []),
-      ...cc,
-      ...(dc.length ? [{ type: "heading", label: "Debit Cards" }] : []),
-      ...dc,
-    ]);
+    setFilteredCards(
+      debitIntent
+        ? [
+            ...(dc.length ? [{ type: "heading", label: "Debit Cards" }] : []),
+            ...dc,
+            ...(cc.length ? [{ type: "heading", label: "Credit Cards" }] : []),
+            ...cc,
+          ]
+        : [
+            ...(cc.length ? [{ type: "heading", label: "Credit Cards" }] : []),
+            ...cc,
+            ...(dc.length ? [{ type: "heading", label: "Debit Cards" }] : []),
+            ...dc,
+          ]
+    );
   };
 
   const onPick = (entry) => {
@@ -500,11 +565,7 @@ const AirlineOffers = () => {
   }
 
   // Collect matches, then dedup
-  const wPermanent = matchesFor(
-    permanentOffers,
-    "permanent",
-    "Permanent"
-  );
+  const wPermanent = matchesFor(permanentOffers, "permanent", "Permanent");
   const wBlinkit = matchesFor(
     blinkitOffers,
     selected?.type === "debit" ? "debit" : "credit",
@@ -523,16 +584,13 @@ const AirlineOffers = () => {
   const dBlinkit = dedupWrappers(wBlinkit, seen);
   const dSwiggy = dedupWrappers(wSwiggy, seen);
 
-  const hasAny = Boolean(
-    dPermanent.length || dBlinkit.length || dSwiggy.length
-  );
+  const hasAny = Boolean(dPermanent.length || dBlinkit.length || dSwiggy.length);
 
-  /** Offer card UI (unchanged) */
+  /** Offer card UI */
   const OfferCard = ({ wrapper, isPermanent, isRetail }) => {
     const o = wrapper.offer;
     const siteName = wrapper.site; // "Blinkit", "Swiggy Instamart", "Permanent"
 
-    // pull fields
     const titleFromCsv =
       firstField(o, LIST_FIELDS.title) || o.Website || o["Offer"];
     const descFromCsv =
@@ -544,12 +602,8 @@ const AirlineOffers = () => {
 
     const link = firstField(o, LIST_FIELDS.link);
 
-    // image (with fallback per-site)
     const rawImage = firstField(o, LIST_FIELDS.image);
-    const { src: finalImg, usingFallback } = resolveImage(
-      siteName,
-      rawImage
-    );
+    const { src: finalImg, usingFallback } = resolveImage(siteName, rawImage);
 
     const showVariantNote =
       VARIANT_NOTE_SITES.has(siteName) &&
@@ -568,9 +622,7 @@ const AirlineOffers = () => {
         )}
 
         <div className="offer-info">
-          <h3 className="offer-title">
-            {titleFromCsv || "Offer"}
-          </h3>
+          <h3 className="offer-title">{titleFromCsv || "Offer"}</h3>
 
           {isPermanent ? (
             <>
@@ -578,29 +630,22 @@ const AirlineOffers = () => {
                 <p className="offer-desc">{permanentBenefit}</p>
               )}
               <p className="inbuilt-note">
-                <strong>
-                  This is a inbuilt feature of this credit card
-                </strong>
+                <strong>This is a inbuilt feature of this credit card</strong>
               </p>
             </>
           ) : (
-            descFromCsv && (
-              <p className="offer-desc">{descFromCsv}</p>
-            )
+            descFromCsv && <p className="offer-desc">{descFromCsv}</p>
           )}
 
           {showVariantNote && (
             <p className="network-note">
-              <strong>Note:</strong> This benefit is applicable only
-              on <em>{wrapper.variantText}</em> variant
+              <strong>Note:</strong> This benefit is applicable only on{" "}
+              <em>{wrapper.variantText}</em> variant
             </p>
           )}
 
           {link && (
-            <button
-              className="btn"
-              onClick={() => window.open(link, "_blank")}
-            >
+            <button className="btn" onClick={() => window.open(link, "_blank")}>
               View Offer
             </button>
           )}
@@ -610,10 +655,7 @@ const AirlineOffers = () => {
   };
 
   return (
-    <div
-      className="App"
-      style={{ fontFamily: "'Libre Baskerville', serif" }}
-    >
+    <div className="App" style={{ fontFamily: "'Libre Baskerville', serif" }}>
       {/* Cards-with-offers strip container */}
       {(chipCC.length > 0 || chipDC.length > 0) && (
         <div
@@ -651,9 +693,7 @@ const AirlineOffers = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <strong
-                style={{ marginRight: 10, color: "#1F2D45" }}
-              >
+              <strong style={{ marginRight: 10, color: "#1F2D45" }}>
                 Credit Cards:
               </strong>
               {chipCC.map((name, idx) => (
@@ -663,9 +703,7 @@ const AirlineOffers = () => {
                   tabIndex={0}
                   onClick={() => handleChipClick(name, "credit")}
                   onKeyDown={(e) =>
-                    e.key === "Enter"
-                      ? handleChipClick(name, "credit")
-                      : null
+                    e.key === "Enter" ? handleChipClick(name, "credit") : null
                   }
                   style={{
                     display: "inline-block",
@@ -674,16 +712,14 @@ const AirlineOffers = () => {
                     borderRadius: 9999,
                     marginRight: 8,
                     background: "#fff",
-                    boxShadow:
-                      "0 1px 2px rgba(0,0,0,0.05)",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     cursor: "pointer",
                     fontSize: 14,
                     lineHeight: 1.2,
                     userSelect: "none",
                   }}
                   onMouseOver={(e) =>
-                    (e.currentTarget.style.background =
-                      "#F0F5FF")
+                    (e.currentTarget.style.background = "#F0F5FF")
                   }
                   onMouseOut={(e) =>
                     (e.currentTarget.style.background = "#fff")
@@ -703,9 +739,7 @@ const AirlineOffers = () => {
               scrollAmount="4"
               style={{ whiteSpace: "nowrap" }}
             >
-              <strong
-                style={{ marginRight: 10, color: "#1F2D45" }}
-              >
+              <strong style={{ marginRight: 10, color: "#1F2D45" }}>
                 Debit Cards:
               </strong>
               {chipDC.map((name, idx) => (
@@ -715,9 +749,7 @@ const AirlineOffers = () => {
                   tabIndex={0}
                   onClick={() => handleChipClick(name, "debit")}
                   onKeyDown={(e) =>
-                    e.key === "Enter"
-                      ? handleChipClick(name, "debit")
-                      : null
+                    e.key === "Enter" ? handleChipClick(name, "debit") : null
                   }
                   style={{
                     display: "inline-block",
@@ -726,16 +758,14 @@ const AirlineOffers = () => {
                     borderRadius: 9999,
                     marginRight: 8,
                     background: "#fff",
-                    boxShadow:
-                      "0 1px 2px rgba(0,0,0,0.05)",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     cursor: "pointer",
                     fontSize: 14,
                     lineHeight: 1.2,
                     userSelect: "none",
                   }}
                   onMouseOver={(e) =>
-                    (e.currentTarget.style.background =
-                      "#F0F5FF")
+                    (e.currentTarget.style.background = "#F0F5FF")
                   }
                   onMouseOut={(e) =>
                     (e.currentTarget.style.background = "#fff")
@@ -809,16 +839,13 @@ const AirlineOffers = () => {
                   style={{
                     padding: "10px",
                     cursor: "pointer",
-                    borderBottom:
-                      "1px solid #f2f2f2",
+                    borderBottom: "1px solid #f2f2f2",
                   }}
                   onMouseOver={(e) =>
-                    (e.currentTarget.style.background =
-                      "#f7f9ff")
+                    (e.currentTarget.style.background = "#f7f9ff")
                   }
                   onMouseOut={(e) =>
-                    (e.currentTarget.style.background =
-                      "transparent")
+                    (e.currentTarget.style.background = "transparent")
                   }
                 >
                   {item.display}
@@ -837,8 +864,7 @@ const AirlineOffers = () => {
             marginTop: 8,
           }}
         >
-          No matching cards found. Please try a different
-          name.
+          No matching cards found. Please try a different name.
         </p>
       )}
 
@@ -854,16 +880,10 @@ const AirlineOffers = () => {
         >
           {!!dPermanent.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>
-                Permanent Offers
-              </h2>
+              <h2 style={{ textAlign: "center" }}>Permanent Offers</h2>
               <div className="offer-grid">
                 {dPermanent.map((w, i) => (
-                  <OfferCard
-                    key={`perm-${i}`}
-                    wrapper={w}
-                    isPermanent
-                  />
+                  <OfferCard key={`perm-${i}`} wrapper={w} isPermanent />
                 ))}
               </div>
             </div>
@@ -871,16 +891,10 @@ const AirlineOffers = () => {
 
           {!!dBlinkit.length && (
             <div className="offer-group">
-              <h2 style={{ textAlign: "center" }}>
-                Offers On Blinkit
-              </h2>
+              <h2 style={{ textAlign: "center" }}>Offers On Blinkit</h2>
               <div className="offer-grid">
                 {dBlinkit.map((w, i) => (
-                  <OfferCard
-                    key={`bl-${i}`}
-                    wrapper={w}
-                    isRetail
-                  />
+                  <OfferCard key={`bl-${i}`} wrapper={w} isRetail />
                 ))}
               </div>
             </div>
@@ -893,11 +907,7 @@ const AirlineOffers = () => {
               </h2>
               <div className="offer-grid">
                 {dSwiggy.map((w, i) => (
-                  <OfferCard
-                    key={`sw-${i}`}
-                    wrapper={w}
-                    isRetail
-                  />
+                  <OfferCard key={`sw-${i}`} wrapper={w} isRetail />
                 ))}
               </div>
             </div>
@@ -937,8 +947,7 @@ const AirlineOffers = () => {
             cursor: "pointer",
             fontSize: 18,
             zIndex: 1000,
-            boxShadow:
-              "0 2px 5px rgba(0,0,0,0.2)",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
             width: isMobile ? 50 : 140,
             height: isMobile ? 50 : 50,
             display: "flex",
