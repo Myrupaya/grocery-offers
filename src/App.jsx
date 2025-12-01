@@ -29,7 +29,7 @@ const VARIANT_NOTE_SITES = new Set([
   "Goibibo",
   "Airline",
   "Permanent",
-  // grocery-specific (only these two files now):
+  // grocery-specific:
   "Blinkit",
   "Swiggy Instamart",
 ]);
@@ -42,6 +42,10 @@ const FALLBACK_IMAGE_BY_SITE = {
     "https://yt3.googleusercontent.com/oe7za_pjcm3tYZKtTAs6aWuZCOzB6aHWnZOGYwrYjuZe72SMkVs3qoCElDQl-ob8CaKNimXI=s900-c-k-c0x00ffffff-no-rj",
   "swiggy instamart":
     "https://static.businessworld.in/Swiggy%20Instamart%20Orange-20%20(1)_20240913021826_original_image_44.webp",
+  zepto:
+    "https://static.toiimg.com/thumb/msid-111158305,imgsize-14390,width-400,resizemode-4/111158305.jpg",
+  bigbasket:
+    "https://tse4.mm.bing.net/th/id/OIP.8ti6MSe9X039YNinnER4fwAAAA?pid=Api&P=0&h=180",
 };
 
 /** -------------------- HELPERS -------------------- */
@@ -278,9 +282,11 @@ const AirlineOffers = () => {
   const [noMatches, setNoMatches] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // offers (ONLY these 3 CSVs)
+  // offers (ONLY these CSVs)
   const [blinkitOffers, setBlinkitOffers] = useState([]);
   const [swiggyOffers, setSwiggyOffers] = useState([]);
+  const [zeptoOffers, setZeptoOffers] = useState([]);
+  const [bigbasketOffers, setBigbasketOffers] = useState([]);
   const [permanentOffers, setPermanentOffers] = useState([]);
 
   // responsive
@@ -349,13 +355,15 @@ const AirlineOffers = () => {
     loadAllCards();
   }, []);
 
-  // 2) Load offer CSVs (ONLY: permanent_offers, blinkit, swiggy_instamart)
+  // 2) Load offer CSVs (blinkit, swiggy_instamart, zepto, bigbasket, permanent_offers)
   useEffect(() => {
     async function loadOffers() {
       try {
         const files = [
           { name: "blinkit.csv", setter: setBlinkitOffers },
           { name: "swiggy_instamart.csv", setter: setSwiggyOffers },
+          { name: "zepto.csv", setter: setZeptoOffers },
+          { name: "bigbasket.csv", setter: setBigbasketOffers },
           { name: "permanent_offers.csv", setter: setPermanentOffers },
         ];
 
@@ -402,6 +410,8 @@ const AirlineOffers = () => {
     // grocery offer files
     harvestRows(blinkitOffers);
     harvestRows(swiggyOffers);
+    harvestRows(zeptoOffers);
+    harvestRows(bigbasketOffers);
 
     // Permanent credit cards (credit only)
     for (const o of permanentOffers || []) {
@@ -415,7 +425,7 @@ const AirlineOffers = () => {
 
     setChipCC(Array.from(ccMap.values()).sort((a, b) => a.localeCompare(b)));
     setChipDC(Array.from(dcMap.values()).sort((a, b) => a.localeCompare(b)));
-  }, [blinkitOffers, swiggyOffers, permanentOffers]);
+  }, [blinkitOffers, swiggyOffers, zeptoOffers, bigbasketOffers, permanentOffers]);
 
   /** search box – UPDATED with fuzzy + select + debit-first logic */
   const onChangeQuery = (e) => {
@@ -576,6 +586,16 @@ const AirlineOffers = () => {
     selected?.type === "debit" ? "debit" : "credit",
     "Swiggy Instamart"
   );
+  const wZepto = matchesFor(
+    zeptoOffers,
+    selected?.type === "debit" ? "debit" : "credit",
+    "Zepto"
+  );
+  const wBigbasket = matchesFor(
+    bigbasketOffers,
+    selected?.type === "debit" ? "debit" : "credit",
+    "BigBasket"
+  );
 
   const seen = new Set();
   // permanent for credit only
@@ -583,13 +603,21 @@ const AirlineOffers = () => {
     selected?.type === "credit" ? dedupWrappers(wPermanent, seen) : [];
   const dBlinkit = dedupWrappers(wBlinkit, seen);
   const dSwiggy = dedupWrappers(wSwiggy, seen);
+  const dZepto = dedupWrappers(wZepto, seen);
+  const dBigbasket = dedupWrappers(wBigbasket, seen);
 
-  const hasAny = Boolean(dPermanent.length || dBlinkit.length || dSwiggy.length);
+  const hasAny = Boolean(
+    dPermanent.length ||
+      dBlinkit.length ||
+      dSwiggy.length ||
+      dZepto.length ||
+      dBigbasket.length
+  );
 
   /** Offer card UI */
   const OfferCard = ({ wrapper, isPermanent, isRetail }) => {
     const o = wrapper.offer;
-    const siteName = wrapper.site; // "Blinkit", "Swiggy Instamart", "Permanent"
+    const siteName = wrapper.site; // "Blinkit", "Swiggy Instamart", "Zepto", "BigBasket", "Permanent"
 
     const titleFromCsv =
       firstField(o, LIST_FIELDS.title) || o.Website || o["Offer"];
@@ -609,6 +637,12 @@ const AirlineOffers = () => {
       VARIANT_NOTE_SITES.has(siteName) &&
       wrapper.variantText &&
       wrapper.variantText.trim().length > 0;
+
+    // 🔹 Scrollable description for Blinkit, Swiggy Instamart, BigBasket
+    const isScrollableDescSite =
+      siteName === "Blinkit" ||
+      siteName === "Swiggy Instamart" ||
+      siteName === "BigBasket";
 
     return (
       <div className="offer-card">
@@ -634,7 +668,20 @@ const AirlineOffers = () => {
               </p>
             </>
           ) : (
-            descFromCsv && <p className="offer-desc">{descFromCsv}</p>
+            descFromCsv &&
+            (isScrollableDescSite ? (
+              <div
+                style={{
+                  maxHeight: 100,
+                  overflowY: "auto",
+                  paddingRight: 6,
+                }}
+              >
+                <p className="offer-desc">{descFromCsv}</p>
+              </div>
+            ) : (
+              <p className="offer-desc">{descFromCsv}</p>
+            ))
           )}
 
           {showVariantNote && (
@@ -908,6 +955,28 @@ const AirlineOffers = () => {
               <div className="offer-grid">
                 {dSwiggy.map((w, i) => (
                   <OfferCard key={`sw-${i}`} wrapper={w} isRetail />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!!dZepto.length && (
+            <div className="offer-group">
+              <h2 style={{ textAlign: "center" }}>Offers On Zepto</h2>
+              <div className="offer-grid">
+                {dZepto.map((w, i) => (
+                  <OfferCard key={`zp-${i}`} wrapper={w} isRetail />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!!dBigbasket.length && (
+            <div className="offer-group">
+              <h2 style={{ textAlign: "center" }}>Offers On BigBasket</h2>
+              <div className="offer-grid">
+                {dBigbasket.map((w, i) => (
+                  <OfferCard key={`bb-${i}`} wrapper={w} isRetail />
                 ))}
               </div>
             </div>
